@@ -1,7 +1,7 @@
 #summary Roadmap
 
 = Roadmap =
-
+ * locking tables
  * move between scopes
  * copy nodes
  * swap nodes
