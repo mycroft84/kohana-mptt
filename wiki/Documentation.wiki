@@ -14,7 +14,7 @@ The mptt approach solves this, the place of a record in the hierarchy is set whe
 
 Major advantage is easy retrieval of multiple levels and speed in doing so. Edits are more costly so use only when the selects outnumber the updates,deletes and inserts by far.
 
-There are much better explanations of the mptt and adjacency list model on the internet and I would *strongly* advice you to read those. They have diagrams and clear which make understanding mptt much easier. Also, I do not feel it is my place to explain mptt.
+There are much better explanations of the mptt and adjacency list model on the internet and I would *strongly* advice you to read those. They have diagrams and clear examples which make understanding mptt much easier. Also, I do not feel it is my place to explain mptt.
 
 Some reading material
  * [http://dev.mysql.com/tech-resources/articles/hierarchical-data.html]
