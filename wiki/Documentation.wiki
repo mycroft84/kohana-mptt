@@ -10,7 +10,9 @@ Nested sets or modified preorder tree traversal (mptt) is a way to store hierarc
 
 The easiest implementation of hierarchies in a database is the adjacency list model. This means a record has a field named something like 'parent_id' which stores the id of the parent of the record. The parent can have another parent and so on and so forth. Problem with retrieving the lineage of a record is that when there are several levels in the hierarchy the queries can become quite expensive.
 
-The mptt approach solves this, the place of a record in the hierarchy is set when the record is created or moved and selecting the record and its lineage is thus less expensive. Result is, however, that moving/ deleting or creating records in the tree is expensive query-wise. Also, when the hierarchy is incorrectly set in the record the integrity tree might be lost.
+The mptt approach solves this, the place of a record in the hierarchy is set when the record is created or moved and selecting the record and its lineage is thus less expensive. Result is, however, that moving/ deleting or creating records in the tree is expensive query-wise. Also, when the hierarchy is incorrectly set in the record the hierachy tree might be lost. 
+
+Major advantage is easy retrieval of multiple levels and speed in doing so. Edits are more costly so use only when the selects outnumber the updates,deletes and inserts by far.
 
 There are much better explanations of the mptt and adjacency list model on the internet and I would *strongly* advice you to read those. They have diagrams and clear which make understanding mptt much easier. Also, I do not feel it is my place to explain mptt.
 
@@ -25,6 +27,8 @@ I think it is important to know how mptt works when using this class so you know
 The MPTT library for Kohana makes it easier to work with nested sets. It takes care of most of the logic for you. Also, it works with the ORM library of Kohana and extends it. This means you can use the normal ORM syntax while working with nested sets. 
 
 *Note:* updating the fields in a table which are used for mptt or deleting records using the ORM syntax 'ORM->delete()' may jeopardize the integrity of the tree.
+
+*Note:* at present this library does not lock tables. This means the integrity of the tree might be at stake with multiple edits happening at once. 
 
 == Some notes on the jargon ==
 Below a list of words used in the library and documentation which may be unclear.
