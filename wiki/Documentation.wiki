@@ -261,6 +261,14 @@ Superficial way of checking the node is valid
 === is_equal_to ===
 === is_descendant_of_or_equal_to()===
 
+== Moving methods ==
+This should work but has not yet been thoroughly tested. It should be self explanatory.
+Also moves children of the current node to the target
+===move_to_next_sibling_of($target)===
+===move_to_prev_sibling_of($target)===
+===move_to_first_child_of($target)===
+===move_to_last_child_of($target)===
+
 == Utility functions ==
 === debug_tree($tree,$disp_col) ===
 Outputs the tree, ids, left and right values and parent ids, + the column you want to display.
