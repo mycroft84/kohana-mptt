@@ -1,0 +1,10 @@
+#summary Roadmap
+
+= Roadmap =
+
+ * move between scopes
+ * copy nodes
+ * swap nodes
+ * integrity check
+ * insert_as_parent_of
+ * recursive iterator thing
