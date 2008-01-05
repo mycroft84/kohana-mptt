@@ -40,7 +40,10 @@ Below a list of words used in the library and documentation which may be unclear
  * path - ancestry of a node
 
 ==Configuration==
-The model of an mptt table will look something like this
+The MPTT.php file can be retrieved from svn [http://kohana-mptt.googlecode.com/svn/trunk/MPTT.php]
+The file should be placed in a libraries folder.
+
+Models are stored in the /models directory. The model of an mptt table will look something like this
 {{{
 class Location_Model extends MPTT {
 
