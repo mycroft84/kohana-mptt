@@ -1,24 +1,10 @@
 <?php
-//http://www.codeigniter.com/wiki/Nested_Sets/
 
 /**
 * File: libraries/MPTT.php
 *
 * An implementation of Joe Celko's Nested Sets as a Kohana model with ORM support.
 *
-* Changelog:
-*         v0.7
-*              * scopes
-*              * parent ids (get_children, delete children)
-*         v0.75
-*              * delete node and move up its descendants
-*              * delete children but not descendants (will move up)
-* Todo
-*     * move between scopes
-*     * copy nodes
-*     * swap nodes
-*     * 
-*     *
 *         
 * Many thanks to 
 *   * Thunder who supplied a similar class for Code Igniter and gave permission to me
