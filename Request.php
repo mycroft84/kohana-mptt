@@ -74,7 +74,7 @@ class Request_Core{
              return self::accepts('atom');
          }
          /**
-          * Returns true if the current call a POST request
+          * Returns true if the current call is a POST request
           *
           * @return bool True if call is a POST
           * @access public
@@ -83,7 +83,7 @@ class Request_Core{
              return (strtolower(self::env('REQUEST_METHOD')) == 'post');
          }
          /**
-          * Returns true if the current call a PUT request
+          * Returns true if the current call is a PUT request
           *
           * @return bool True if call is a PUT
           * @access public
@@ -92,7 +92,7 @@ class Request_Core{
              return (strtolower(self::env('REQUEST_METHOD')) == 'put');
          }
          /**
-          * Returns true if the current call a GET request
+          * Returns true if the current call is a GET request
           *
           * @return bool True if call is a GET
           * @access public
@@ -101,7 +101,7 @@ class Request_Core{
              return (strtolower(self::env('REQUEST_METHOD')) == 'get');
          }
          /**
-          * Returns true if the current call a DELETE request
+          * Returns true if the current call is a DELETE request
           *
           * @return bool True if call is a DELETE
           * @access public
