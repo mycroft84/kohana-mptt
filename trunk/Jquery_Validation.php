@@ -18,6 +18,7 @@ class Jquery_Validation_Core {
 	}
 	public function load(Forge $form)
 	{
+	
 		$this->form=$form;
 		
 		foreach ($form->inputs as $field=> $input)
@@ -88,7 +89,12 @@ class Jquery_Validation_Core {
 	public function as_array()
 	{
 		return $this->jquery;
-			
+		
+	}
+	public function load_array($array)
+	{
+		$this->jquery=$array;
+		return $this;
 	}
 	public function as_json()
 	{
@@ -105,3 +111,4 @@ class Jquery_Validation_Core {
 	}
 
 }
+?>
