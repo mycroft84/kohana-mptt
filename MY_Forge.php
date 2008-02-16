@@ -3,12 +3,12 @@
 class Forge extends Forge_Core {
 	public function error_message($func,$args)
 	{
-
+		
 		// Force args to be an array
-		$args = is_array($args) ? $args : array();
-
-		// Add the label or name to the beginning of the args
-		array_unshift($args, $this->label ? strtolower($this->label) : $this->name);
+		if(!is_array($args))
+		{
+			$args=array($args);
+		}
 
 		if (isset($this->error_messages[$func]))
 		{
@@ -19,6 +19,7 @@ class Forge extends Forge_Core {
 		{
 			// Fetch an i18n error message
 			$error = Kohana::lang('validation.'.$func, $args);
+			
 		}
 
 		return $error;
