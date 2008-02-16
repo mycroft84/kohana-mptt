@@ -1,6 +1,8 @@
 <?php
 
 class Forge extends Forge_Core {
+	//Fetches error message for the function see i18n/*/validation.php for names
+	//$args can be array or string, first value will be the name of the field
 	public function error_message($func,$args)
 	{
 		
@@ -24,6 +26,7 @@ class Forge extends Forge_Core {
 
 		return $error;
 	}
+	//gets set attributes
 	public function get_attr($attr)
 	{
 		if(array_key_exists($attr,$this->attr))
