@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 class Formation_Core extends Validation{
 	
@@ -8,19 +8,30 @@ class Formation_Core extends Validation{
 		'method'=>'POST'
 	);
 	
-
 	//Template with the form to load
 	protected $template='formation_template';
 	
 	//Key/value pairs passed onto the template
 	protected $template_vars=array();
 
-	//empty on purpose
+	/**
+	 * Constructor
+	 *
+	 * @param string $legend
+	 */
 	public function __construct($legend='Form')
 	{
-		$this->legend=$legend;
+		$this->template_vars['legend']=$legend;
+		// Set element autoloader
+		spl_autoload_register(array('Validation', 'auto_load'));		
+
 	}
-	//Set variables for the template
+	/**
+	 * Set variables for form template
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 */
 	public function __set($key,$value)
 	{
 		$this->template_vars[$key]=$value;
@@ -67,6 +78,12 @@ class Formation_Core extends Validation{
 		}
 		return false;
 	}
+	/**
+	 * Validate partial
+	 *
+	 * @param unknown_type $partial
+	 * @return unknown
+	 */
 	public function validate_partial($partial)
 	{
 		if($this->load_values()!=false)
@@ -77,7 +94,12 @@ class Formation_Core extends Validation{
 		return false;
 
 	}	
-	public function load_values()
+	/**
+	 * Load values from POST,GET
+	 *
+	 * @return bool
+	 */
+	protected function load_values()
 	{
 		static $method;
 		$method=strtolower($this->attr['method']);
@@ -92,20 +114,15 @@ class Formation_Core extends Validation{
 					//Load value if present
 					$this[$name]->load_value(Input::instance()->$method($name));	
 				}
-	
 			}
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
-
 	/**
 	 * Add element to form
 	 *
-	 * @param unknown_type $type
+	 * @param Field object, name $type
 	 * @param unknown_type $name
 	 * @return unknown
 	 */
@@ -120,7 +137,7 @@ class Formation_Core extends Validation{
 		else
 		{
 			if ($name==null)
-				throw new Kohana_Exception('formation.invalid_input', get_class($type));
+				throw new Kohana_Exception('formation.invalid_rule', get_class($rule));
 				
 			$type='Element_'.ucfirst(strtolower($type));
 			$this[$name]=new $type($name);	
@@ -137,10 +154,13 @@ class Formation_Core extends Validation{
 		if(isset($this[$element_name]))
 		{
 			unset($this[$element_name]);
+			return $this;
 		}
+		return false;
 	}
 	/**
 	 * Returns element object
+	 * @return mixed
 	 */
 	public function get_element($element_name)
 	{
@@ -152,6 +172,8 @@ class Formation_Core extends Validation{
 	}
 	/**
 	 * Clear elements from form 
+	 * 
+	 * @return object
 	 */
 	public function clear_elements()
 	{
@@ -221,6 +243,8 @@ class Formation_Core extends Validation{
 	}
 	/**
 	 * Returns element object
+	 * @return mixed
+	 * 
 	 */
 	public function get_group($group_name)
 	{
@@ -232,6 +256,7 @@ class Formation_Core extends Validation{
 	}	
 	/**
 	 * Clears all groups
+	 * @return mixed
 	 */
 	public function clear_groups()
 	{
@@ -249,12 +274,11 @@ class Formation_Core extends Validation{
 		}
 		return $this;
 	}
-	//TODO remove element, clear elements, add elements
 	/**
 	 * Set the template for the form
 	 *
 	 * @param unknown_type $template
-	 * @return unknown
+	 * @return object
 	 */
 	public function set_template($template)
 	{
@@ -264,7 +288,7 @@ class Formation_Core extends Validation{
 	/**
 	 * Get template of the form
 	 *
-	 * @return unknown
+	 * @return string
 	 */
 	public function get_template()
 	{
@@ -273,7 +297,7 @@ class Formation_Core extends Validation{
 	/**
 	 * Render the form with the given template
 	 *
-	 * @return unknown
+	 * @return string
 	 */
 	public function render($template=null)
 	{
@@ -297,9 +321,8 @@ class Formation_Core extends Validation{
 		$form->open  = form::$form_type(arr::remove('action', $this->attr), $this->attr);
 		$form->close = form::close();
 
-		//Errors and messages passed on to the form
+		//Errors and messages passed on to the form, not used in formation_template.php
 		$form->errors= $this->errors();
-		$form->error_messages=$this->error_messages();
 		
 		// Set the inputs
 		$form->inputs = $this;
@@ -314,7 +337,7 @@ class Formation_Core extends Validation{
 	 */
 	public function __toString()
 	{
-		return $this->render();
+		return (string) $this->render();
 	}
 	/**
 	 * Set a form attribute. This method is chainable.
@@ -329,10 +352,11 @@ class Formation_Core extends Validation{
 		$this->attr[$key] = $val;
 		return $this;
 	}
-	/*
-	 * Get attribute of <form>
-	 * $param string
-	 * @return string|bool
+	/**
+	 * Return attribute of <form>
+	 *
+	 * @param string $key
+	 * @return mixed
 	 */
 	public function get_attr($key)
 	{
@@ -345,8 +369,8 @@ class Formation_Core extends Validation{
 	/**
 	 * Set the method for the form
 	 *
-	 * @param unknown_type $method
-	 * @return unknown
+	 * @param string $method
+	 * @return object
 	 */
 	public function set_method($method)
 	{
@@ -355,7 +379,7 @@ class Formation_Core extends Validation{
 	/**
 	 * Get the method of the form
 	 *
-	 * @return unknown
+	 * @return mixed
 	 */
 	public function get_method()
 	{
@@ -364,17 +388,17 @@ class Formation_Core extends Validation{
 	/**
 	 * Set action of the form
 	 *
-	 * @param unknown_type $action
-	 * @return unknown
+	 * @param string $action
+	 * @return object
 	 */
 	public function set_action($action)
 	{
 		return $this->set_attr('action',$action);
 	}
 	/**
-	 * G
+	 * Get action of the form
 	 *
-	 * @return unknown
+	 * @return string
 	 */
 	public function get_action()
 	{
@@ -384,7 +408,7 @@ class Formation_Core extends Validation{
 	 * set values of the form e.g. form db
 	 *
 	 * @param array $data
-	 * @return unknown
+	 * @return object
 	 */
 	public function set_values(array $data)
 	{

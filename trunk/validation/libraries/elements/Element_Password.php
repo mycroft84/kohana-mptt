@@ -5,6 +5,7 @@ class Element_Password_Core extends Element_Input {
 	protected $attr = array
 	(
 		'type'  => 'password',
+		'class'=>'password'	
 
 	);
 

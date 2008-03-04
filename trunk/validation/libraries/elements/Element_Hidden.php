@@ -4,7 +4,7 @@ class Element_Hidden_Core extends Element_Input {
 	
 	protected $attr = array
 	(
-
+		'class'=>'hidden'
 	);
 	public function render()
 	{

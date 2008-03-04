@@ -1,19 +1,8 @@
 <?php defined('SYSPATH') or die('No direct script access.');
-/**
- * Validation library.
- *
- * $Id: Validation.php 2070 2008-02-17 05:56:26Z armen $
- *
- * @package    Validation
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
 class Validation_Core extends ArrayObject {
 
 	// Errors
 	protected $errors = array();
-	protected $messages = array();
 
 	/**
 	 * Creates a new Validation instance.
@@ -25,10 +14,9 @@ class Validation_Core extends ArrayObject {
 	{
 		return new Validation( ! is_array($array) ? $_POST : $array);
 	}
-
 	/**
-	 * Sets the unique "any field" key and creates an ArrayObject from the
-	 * passed array.
+	 * Pass the array you need to validate, e.g. $_POST
+	 * 
 	 *
 	 * @param   array   array to validate
 	 * @return  void
@@ -40,11 +28,60 @@ class Validation_Core extends ArrayObject {
 		
 		foreach($array as $key=>$value)
 		{
+			//Create object for each key in array
 			$array_object[$key]=new Field($key,$value,$this); 
 		}
+		//Register auto load for rules and elements
+		spl_autoload_register(array('Validation', 'auto_load'));
+		
 		parent::__construct($array_object, ArrayObject::ARRAY_AS_PROPS | ArrayObject::STD_PROP_LIST);
+			
 	}
+	/**
+	 * Autoloader so elements can be stuffed in an subdir
+	 *
+	 * @param class $class
+	 * @return bool
+	 */
+	public static function auto_load($class)
+	{
+		if((substr($class, 0, 7))!='Element' && substr($class, 0, 4)!='Rule' )
+			return FALSE;
+			
+		static $prefix;
+		
+		// Set the extension prefix
+		empty($prefix) and $prefix = Config::item('core.extension_prefix');
 
+		if (class_exists($class, FALSE))
+			return TRUE;
+		
+		$file=strpos($class,'Core') ? substr($class, 0, -5) : $class;
+	
+		$type = (substr($class, 0, 7)=='Element') ? 	'libraries/elements' : 'libraries/rules';		
+	
+		// If the file doesn't exist, just return
+		if (($filepath = Kohana::find_file($type, $file)) === FALSE)
+			return FALSE;
+		
+		// Load the requested file
+		require_once $filepath;
+		
+		if ($extension = Kohana::find_file($type, $prefix.$class))
+		{
+			// Load the class extension
+			require_once $extension;
+		}
+		elseif (substr($class, -5) !== '_Core' AND class_exists($class.'_Core', FALSE))
+		{
+			// Transparent class extensions are handled using eval. This is
+			// a disgusting hack, but it works very well.
+			eval('class '.$class.' extends '.$class.'_Core { }');
+		}
+		
+
+		return class_exists($class, FALSE);			
+	}	
 	/**
 	 * Returns the ArrayObject array values.
 	 *
@@ -60,17 +97,18 @@ class Validation_Core extends ArrayObject {
 		return $array;
 	}
 	/**
-	 * Get all post filters
+	 * Get all rules
 	 *
 	 * @return object
 	 */
 	public function get_rules()
 	{
+		$rules=array();
 		foreach($this as $field)
 		{
-			$callbacks[$field->name]=$field->get_rules();
+			$rules[$field->name]=$field->get_rules();
 		}
-		return $this;
+		return $rules;
 	}	
 	/**
 	 * Add rule to all fields
@@ -122,11 +160,12 @@ class Validation_Core extends ArrayObject {
 	 */
 	public function get_pre_filters()
 	{
+		$pre_filters=array();
 		foreach($this as $field)
 		{
-			$callbacks[$field->name]=$field->get_pre_filters();
+			$pre_filters[$field->name]=$field->get_pre_filters();
 		}
-		return $this;
+		return $pre_filters;
 	}
 	/**
 	 * Add pre filter to all fields
@@ -178,11 +217,12 @@ class Validation_Core extends ArrayObject {
 	 */
 	public function get_post_filters()
 	{
+		$post_filters=array();
 		foreach($this as $field)
 		{
-			$callbacks[$field->name]=$field->get_post_filters();
+			$post_filters[$field->name]=$field->get_post_filters();
 		}
-		return $this;
+		return $post_filters;
 	}	
 	/**
 	 * Add post filter to all fields
@@ -234,11 +274,12 @@ class Validation_Core extends ArrayObject {
 	 */
 	public function get_callbacks()
 	{
+		$callbacks=array();
 		foreach($this as $field)
 		{
 			$callbacks[$field->name]=$field->get_callbacks();
 		}
-		return $this;
+		return $callbacks;
 	}
 	/**
 	 * Add callback to all fields
@@ -303,7 +344,6 @@ class Validation_Core extends ArrayObject {
 		}
 		return $this;
 	}
-
 	/**
 	 * Validate by processing pre-filters, rules, callbacks, and post-filters.
 	 * All fields that have filters, rules, or callbacks will be initialized if
@@ -313,7 +353,7 @@ class Validation_Core extends ArrayObject {
 	 * @return bool
 	 */
 	public function validate()
-	{
+	{	
 		//Iterate over all fields and collect errors and error messages
 		foreach($this as $key=>$field)
 		{
@@ -322,16 +362,13 @@ class Validation_Core extends ArrayObject {
 
 			if($field instanceof Element_Group)
 			{
-				$this->errors=array_merge($field->errors(),$this->errors);
-				$this->messages=array_merge($field->error_messages(),$this->messages);
-				
+				$this->errors=array_merge($field->error(),$this->errors);
 			}
 			else
 			{
 				if($is_valid==false)
 				{
 					$this->errors[$key]=$field->error();
-					$this->messages[$key]=$field->error_message();	
 				}
 			}
 		}		
@@ -356,16 +393,13 @@ class Validation_Core extends ArrayObject {
 					
 					if($this[$field] instanceof Element_Group)
 					{
-						$this->errors=array_merge($field->errors(),$this->errors);
-						$this->messages=array_merge($field->error_messages(),$this->messages);
+						$this->errors=array_merge($field->error(),$this->errors);
 					}
 					else
 					{	
 						if($this[$field]->error()!= null)
 						{
 							$this->errors[$this[$field]->name]=$this[$field]->error();
-							
-							$this->messages[$this[$field]->name]=$this[$field]->error_message();	
 						}
 					}	
 				}
@@ -376,15 +410,15 @@ class Validation_Core extends ArrayObject {
 	/**
 	 * Validate partial json
 	 *
-	 * @param unknown_type $array
-	 * @return unknown
+	 * @param array fields you want to validate
+	 * @return json boolean
 	 */
 	public function validate_partial_json($array)
 	{
 		return jsonencode($this->validate_partial($array));
 	}
 	/**
-	 * Return the errors array.
+	 * Return the errors and messages array.
 	 *
 	 * @return array
 	 */
@@ -392,39 +426,11 @@ class Validation_Core extends ArrayObject {
 	{
 		return $this->errors;
 	}
-	/**
-	 * Return error messages
-	 *
-	 * @return array
-	 */
-	public function error_messages()
+	public function set_language_file($file)
 	{
-		return $this->messages;
-	}
-	/**
-	 * Provides a generic interface to load the errors.
-	 */
-	public function load_errors($form_name = '')
-	{
-		foreach ($this->errors as $input => $error)
+		foreach($this as $field)
 		{
-			$key = ($form_name)?
-				"forms.$form_name.$input.$error" :
-				"forms.$input.$error";
-
-			if (($str = Kohana::lang($key)) === $key)
-			{
-				// Get the non-error-specific message
-				$key = ($form_name)?
-					"forms.$form_name.$input.default" :
-					"forms.$input.default";
-			
-				$str = Kohana::lang($key);
-			}
-
-			// Add the message
-			$this->message($input, $str);
+			$field->set_language_file($file);
 		}
-	}	
-
+	}
 } // End Validation

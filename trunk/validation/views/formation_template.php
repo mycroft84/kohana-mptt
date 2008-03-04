@@ -6,7 +6,7 @@
 		<?php endif;
 		
 		foreach($inputs as $input):
-		
+			//Do some special magic if it's a group element
 			if ($input instanceof Element_Group):
 				?>	<li>
 			<?= $input->render();
@@ -21,10 +21,10 @@
 						?>	<li><?php echo $input->label(); 
 					endif; 
 						echo $input->render(); 
-		
-					if($input->error_message() !== false):
+
+					if(($error_message=$input->error_message()) !== false):
 			
-						?><label class="error" for="<?=$input->name?>"><?php echo $input->error_message() ?></label><?php
+						?><label class="error" for="<?=$input->name?>"><?=$error_message ?></label><?php
 					endif; ?></li>
 		<?php 
 				endif;
