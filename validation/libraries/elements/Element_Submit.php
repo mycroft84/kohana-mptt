@@ -5,6 +5,7 @@ class Element_Submit_Core extends Element_Input {
 	protected $attr = array
 	(
 		'type'  => 'submit',
+		'class'=>'submit'	
 		
 	);
 	public function __construct($name,$value=null)

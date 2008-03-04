@@ -5,6 +5,7 @@ class Element_Checkbox_Core extends Element_Input {
 	protected $attr = array
 	(
 		'type' => 'checkbox',
+		'class' => 'checkbox',
 		'checked' => FALSE,
 	);	
 

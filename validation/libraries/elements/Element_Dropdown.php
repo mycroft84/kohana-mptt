@@ -6,7 +6,7 @@ class Element_Dropdown_Core extends Element_Input {
 	
 	protected $attr = array
 	(
-
+		'class'=>'dropdown'
 	);
 
 	public function set_options($options)

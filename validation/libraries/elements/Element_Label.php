@@ -5,6 +5,8 @@ class Element_Label_Core extends Element_Input {
 	protected $attr=array();
 	protected $text;
 	
+	protected $label;
+	
 	public function __construct($name,$text=null)
 	{
 		$this->set_attr('for',$name);
@@ -24,9 +26,26 @@ class Element_Label_Core extends Element_Input {
 	}
 	public function render()
 	{
+		if($this->label != NULL)
+		{
+			return $this->label;
+		}
+		elseif($this->label===false)
+		{
+			return '';
+		}
+		
 		return form::label($this->attr,$this->text);
 		
 	}		
+	public function set_label($label)
+	{
+		$this->label=$label;
+	}
+	public function disable()
+	{
+		$this->label==false;
+	}
 	/**
 	 * Returns the form HTML
 	 */

@@ -39,6 +39,9 @@ class Field_Core {
 	//Validation object, useful for callbacks
 	protected $validation;
 	
+	protected $required=false;
+	
+	protected $_rules=array();
 	/**
 	 * Construct 
 	 *
@@ -58,7 +61,9 @@ class Field_Core {
 		{
 			$this->validation=$validation_object;
 		}
+		
 	}
+
 	/**
 	 * Convert object to string when echoed
 	 *
@@ -109,37 +114,27 @@ class Field_Core {
 	{
 		if(is_bool($this->is_valid))
 			return $this->is_valid;
-		
+			
 		//Iterate over filters, rules and callbacks
 		foreach ($this->pre_filters as $filter)
 		{
 			//Filter value, or every value of an array
 			$this->value = is_array($this->value) ? array_map($filter, $this->value) : call_user_func($filter, $this->value);
 		}	
-		foreach ($this->rules as $rule)
+		foreach($this->rules as $name=>$rule)
 		{
-			
-			
-			// Split the rule into function and args
-			list($func, $args) = $rule;	
-				
-			// Prevent other rules from running when this field already has errors
 			if ( ! empty($this->errors)) break;
-			
-			// Don't process rules on empty fields
-			if (($func[1] !== 'required' AND $func[1] !== 'matches') AND empty($this->value))
-				continue;
-			
-			// Run each rule, pass value and then arguments
-			if ( ! call_user_func($func, $this->value, $args))
-			{	
-				$error=is_array($func) ? $func[1] : $func;
 
-				$this->add_error($error,$args);
-				// Stop after an error is found
+			//Stop when field is empty
+			if(empty($this->value)&&$name!='Rule_Required')
 				break;
-			}				
-		}		
+							
+			if(!$rule->is_valid($this->value))
+			{
+				$rule->name=$this->name;
+				$this->add_error($name,$rule->get_message());
+			}
+		}	
 		foreach ($this->callbacks as $callback)
 		{
 			// Execute the callback, $this is passed so you can access entire validation procedure
@@ -292,28 +287,24 @@ class Field_Core {
 	 * Add rule to the object
 	 *
 	 * @chainable
-	 * @param   callback  rule
+	 * @param   object  rule
 	 * @return  object
 	 */
-	public function add_rule($rule)
+	public function add_rule($rule,$arguments=null,$name=null)
 	{
-		$rule=$this->parse_rule($rule);
-		//name string rules
-		if($rule[2]!=null)
+		//$rule must be child of Rule but not Rule itself
+		if(!($rule instanceof Rule) || get_class($rule)=='Rule')
 		{
-			$name=array_pop($rule);
-			$this->rules[$name]= $rule;
+			if(!($rule=new $rule($arguments)))
+				throw new Kohana_Exception('formation.invalid_input', get_class($type));
+			
 		}
-		else
-		{
-			$this->rules[]=$rule;
-		}
+		//Custom names for fields
+		$name=($name==null)? get_class($rule) : $name;
 		
-
+		$this->rules[$name]=$rule;
 		return $this;
 	}	
-	
-
 	/**
 	 * Add array of rules
 	 *
@@ -337,22 +328,11 @@ class Field_Core {
 	 */
 	public function remove_rule($rule)
 	{
-
 		if(isset($this->rules[$rule]))
 		{
 			unset($this->rules[$rule]);
 			return $this;
 		}
-		else
-		{
-			$rule=array_search($rule,$this->rules);
-			if($rule !== FALSE)
-			{
-				unset($this->rules[$rule]);
-				return $this;
-			}
-		}
-		
 		return false;
 	}
 	/**
@@ -415,7 +395,7 @@ class Field_Core {
 	 */
 	public function remove_post_filter($filter)
 	{
-		$filter=array_search($filter,$this->pre_filters);
+		$filter=array_search($filter,$this->post_filters);
 		if($filter !== FALSE)
 		{
 			unset($this->post_filters[$filter]);
@@ -521,11 +501,9 @@ class Field_Core {
 	 * @param   array  error arguments
 	 * @return  object
 	 */
-	public function add_error($error,$args=null)
+	public function add_error($error,$message=null)
 	{
-		$this->errors = $error;
-		$this->args   = $args;
-		
+		$this->errors[$error] = $message;
 		return $this;
 	}	
 	/**
@@ -536,23 +514,11 @@ class Field_Core {
 	public function remove_error()
 	{
 		$this->errors = null;
-		$this->args   = null;
-		
+	
 		return $this;
 	}
 	/**
-	 * Set error message
-	 *
-	 * @param unknown_type $error
-	 * @param unknown_type $args
-	 */
-	public function set_error_message($error,$value)
-	{
-		$this->error_messages[$error]=$value;
-		return $this;
-	}
-	/**
-	 * Set the format of message strings for particular fields
+	 * Set the format of message strings for his field
 	 *
 	 * @chainable
 	 * @param   string   new message format
@@ -577,7 +543,6 @@ class Field_Core {
 	{
 		return $this->message_format;
 	}
-
 	/**
 	 * Returns the message for an input. 
 	 *
@@ -589,181 +554,16 @@ class Field_Core {
 		if (empty($this->errors))
 			return false;
 		
-		//If arguments present 
-		$replace=array();
-		
-		if(!empty($this->args))
-		{
-			$replace=$this->args;
-		}
-		
-		//Set a friendly field name just the standard name
-		$name=(empty($this->screen_name)) ? $this->name : $this->screen_name; 
-
-		//Place the name in front of the array
-		array_unshift($replace,$name);
-		
-		//Check for custom messages
-		if(array_key_exists($this->error(),$this->error_messages))
-		{
-			$message=$this->error_messages[$this->error()];
-		}
-		else
-		{//resort to default messages
-			$error=($this->error()=='email') ? 'valid_email' : $this->error();
-			//Get error string
-			$message=Kohana::lang('validation.'.$error);	
-		}
-
-		//Replace stuff in the error string with vars
-		$message = (strpos($message, '%s') !== FALSE) ? vsprintf($message, $replace) : $message;
-
-		// Return the HTML message string
-		return str_replace('{message}', $message, $this->message_format);
-
+		return str_replace('{message}', current($this->errors), $this->message_format);
 	}	
-	public function set_required($required=true)
+	public function set_language_file($file)
 	{
-		if($required==true)
+		foreach($this->rules as $rule)
 		{
-			return $this->add_rule('required');
+			$rule->set_language_file($file);
 		}
-		return $this->remove_rule('required');
+		return $this;
 	}
 
-
-	/**
-	 * Rule: required. Generates an error if the field has an empty value.
-	 *
-	 * @param   mixed   input value
-	 * @return  bool
-	 */
-	public function required($str)
-	{
-		return ! ($str === '' OR $str === NULL OR $str === FALSE OR (is_array($str) AND empty($str)));
-	}
-	
-	/**
-	 * Rule: matches. Generates an error if the field does not match one or more
-	 * other fields.
-	 *
-	 * @param   mixed   input value
-	 * @param   array   input names to match against
-	 * @return  bool
-	 */
-	//TODO fix it
-	public function matches($str, array $inputs)
-	{
-		foreach ($inputs as $key)
-		{
-			if ($str !== (isset($key) ? $key : NULL))
-				return FALSE;
-		}
-
-		return TRUE;
-	}
-	/**
-	 * Rule: length. Generates an error if the field is too long or too short.
-	 *
-	 * @param   mixed   input value
-	 * @param   array   minimum, maximum, or exact length to match
-	 * @return  bool
-	 */
-	public function length($str, array $length)
-	{
-		if ( ! is_string($str))
-			return FALSE;
-
-		$size = utf8::strlen($str);
-		$status = FALSE;
-
-		if (count($length) > 1)
-		{
-			list ($min, $max) = $length;
-
-			if ($size >= $min AND $size <= $max)
-			{
-				$status = TRUE;
-			}
-		}
-		else
-		{
-			$status = ($size === (int) $length[0]);
-		}
-
-		return $status;
-	}
-	/**
-	 * Rule: length. Generates an error if the field is too long or too short.
-	 *
-	 * @param   mixed   input value
-	 * @param   array   minimum, maximum, or exact length to match
-	 * @return  bool
-	 */
-	public function min_length($str, array $length)
-	{
-		if ( ! is_string($str))
-			return FALSE;
-
-		$size = utf8::strlen($str);
-		$status = FALSE;
-
-		if (count($length) > 1)
-		{
-			list ($min, $max) = $length;
-
-			if ($size >= $min AND $size <= $max)
-			{
-				$status = TRUE;
-			}
-		}
-		else
-		{
-			$status = ($size === (int) $length[0]);
-		}
-
-		return $status;
-	}		
-	/**
-	 * Parse a rule, get its arguments etc.
-	 * internal function
-	 */
-	protected function parse_rule($rule)
-	{
-		//Rule arguments
-		$args = NULL;
-		
-		$rule_name=null;
-		
-		if (is_string($rule))
-		{
-			//Set a rulename if it's a string, necessary for removing
-			$rule_name=$rule;
-			
-			if (preg_match('/^([^\[]++)\[(.+)\]$/', $rule, $matches))
-			{
-				// Split the rule into the function and args
-				$rule = $matches[1];
-				$args = preg_split('/(?<!\\\\),\s*/', $matches[2]);
-
-				// Replace escaped comma with comma
-				$args = str_replace('\,', ',', $args);
-			}
-			
-			if (method_exists($this, $rule))
-			{
-				// Make the rule a valid callback
-				$rule = array($this, $rule);
-			}
-			
-		}
-
-		if ( ! is_callable($rule, TRUE))
-			throw new Kohana_Exception('validation.rule_not_callable');
-
-		$rule = (is_string($rule) AND strpos($rule, '::') !== FALSE) ? explode('::', $rule) : $rule;
-		
-		return array($rule, $args,$rule_name);
-	}	
 }
 ?>

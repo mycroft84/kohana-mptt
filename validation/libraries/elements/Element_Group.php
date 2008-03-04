@@ -20,9 +20,8 @@ class Element_Group_Core extends Formation {
 	public function render()
 	{
 		$form=new View($this->template);
-		//TODO multipart support
-		$form_type='open';
-		
+
+		//Forms are already opened
 		$form->open  = '';
 		$form->close = '';
 		// Set the inputs
@@ -30,8 +29,8 @@ class Element_Group_Core extends Formation {
 		
 		//Errors and messages passed on to the form
 		$form->errors= $this->errors();
-		$form->error_messages=$this->error_messages();
 		
+		//Set template variables set with __set
 		$form->set($this->template_vars);
 		
 		return $form;

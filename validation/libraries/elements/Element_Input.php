@@ -5,6 +5,7 @@ class Element_Input_Core extends Field {
 	protected $attr=array
 	(
 		'type'    => 'text',
+		'class'=>'text'	
 	);
 	
 	protected $label;
@@ -12,7 +13,6 @@ class Element_Input_Core extends Field {
 	// Message output format
 	protected $message_format = '{message}';
 	
-
 	/**
 	 * Magically gets a variable.
 	 *
@@ -96,9 +96,6 @@ class Element_Input_Core extends Field {
 	 */
 	public function render()
 	{
-		// Make sure validation runs
-		$this->validate();
-
 		return $this->html_element();
 	}
 	/**
@@ -109,7 +106,6 @@ class Element_Input_Core extends Field {
 	 */
 	public function load_value($value)
 	{
-		
 		$this->set_value($value);
 		return $this;
 	}
@@ -127,4 +123,3 @@ class Element_Input_Core extends Field {
 		return form::input($data);
 	}
 }
-?>
