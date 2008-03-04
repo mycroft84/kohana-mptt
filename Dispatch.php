@@ -30,6 +30,13 @@ class Dispatch_Core{
 		$this->controller=$controller;
 		
 	}
+	public function __call($name,$arguments)
+	{
+		if(method_exists($this->controller,$name))
+		{
+			return $this->method($name,$arguments);
+		}
+	}
 	public function method($method,$arguments=null)
 	{
 		ob_start();
