@@ -459,7 +459,15 @@ class MPTT extends ORM {
 
 		self::$db->delete($this->table, $where);
 		return;
-	}    
+	} 
+	/**
+	*
+	* overrides delete of ORM
+	*/
+	public function delete()
+	{
+		return $this->delete_node();   
+	}
 	/**
 	* Deletes the given node ((itself)  from the tree table
 	* @param children boolean set to false to not delete children 
