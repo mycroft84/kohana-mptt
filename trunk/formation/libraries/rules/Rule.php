@@ -1,6 +1,6 @@
 <?php
 
-class Rule_Core {
+ class Rule_Core {
 
 	protected $is_valid;
 	
@@ -31,7 +31,7 @@ class Rule_Core {
 		}
 
 	}
-
+	
 	public function set_language_file($file)
 	{
 		$this->language_file=$file;

@@ -4,17 +4,6 @@ class Validation_Core extends ArrayObject{
 	// Errors
 	protected $errors = array();
 
-	protected $fields=array();
-	/**
-	 * Creates a new Validation instance.
-	 *
-	 * @param   array   array to use for validation
-	 * @return  object
-	 */
-	public static function factory($array = NULL)
-	{
-		return new Validation( ! is_array($array) ? $_POST : $array);
-	}
 	/**
 	 * Pass the array you need to validate, e.g. $_POST
 	 * 
@@ -105,7 +94,7 @@ class Validation_Core extends ArrayObject{
 	
 	public function offsetSet($key,$value)
 	{
-		if(!($value instanceof Element_Input))
+		if(!($value instanceof Element_Input) && !($value instanceof Element_Group))
 		{
 			$value=new Field($key,$value);
 		}
@@ -394,13 +383,13 @@ class Validation_Core extends ArrayObject{
 			
 			if($field instanceof Element_Group)
 			{
-				$this->errors=array_merge($field->error(),$this->errors);
+				$this->errors=array_merge($field->errors(),$this->errors);
 			}
 			else
 			{
 				if($is_valid==false)
 				{
-					$this->errors[$key]=$field->error();
+					$this->errors[$key]=$field->errors();
 				}
 			}
 		}		
@@ -426,13 +415,13 @@ class Validation_Core extends ArrayObject{
 					
 					if($this[$field] instanceof Element_Group)
 					{
-						$this->errors=array_merge($this[$field]->error(),$this->errors);
+						$this->errors=array_merge($this[$field]->errors(),$this->errors);
 					}
 					else
 					{	
-						if($this[$field]->error()!= null)
+						if($this[$field]->errors()!= null)
 						{
-							$this->errors[$this[$field]->name]=$this[$field]->error();
+							$this->errors[$this[$field]->name]=$this[$field]->errors();
 						}
 					}	
 				}
@@ -467,78 +456,4 @@ class Validation_Core extends ArrayObject{
 		}
 	}
 } // End Validation
-class Validation_Iterator implements Iterator, Countable {
 
-	protected $array;
-
-
-
-	public function __construct($array)
-	{
-		$this->array = $array;
-
-	}
-
-	/**
-	 * Returns an array of all the
-	/*
-	 
-	 */
-	public function as_array()
-	{
-		foreach($this->array as $field)
-		{
-			
-		}
-		return 'dd';
-	}
-	/**
-	 * Iterator: current
-	 */
-	public function current()
-	{
-
-		return current($this->array);
-	}
-
-	/**
-	 * Iterator: key
-	 */
-	public function key()
-	{
-		return key($this->array);
-	}
-
-	/**
-	 * Iterator: next
-	 */
-	public function next()
-	{
-		return next($this->array);
-	}
-
-	/**
-	 * Iterator: rewind
-	 */
-	public function rewind()
-	{
-		return reset($this->array);
-	}
-
-	/**
-	 * Iterator: valid
-	 */
-	public function valid()
-	{
-		return valid($this->array);
-	}
-
-	/**
-	 * Countable: count
-	 */
-	public function count()
-	{
-		return count($this->array);
-	}
-
-} // End ORM Iterator
