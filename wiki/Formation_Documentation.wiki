@@ -104,7 +104,12 @@ Again, fairly simple or not :)
 		$form->add_element($input->add_rule('Rule_Matches',$form['username']))->label()->set_text('email label ');
 		$form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
 		$form->add_element('input','email')->add_rule('Rule_Email')->add_rule('Rule_Required');
+$form->add_group(array('username'),'group1');
+$form['group1']->add_element('password','Password field')->add_rule('Rule_Min_Length',8);
+
 		$form->add_element('submit','Submit');
+$form['group1']->legend='User/pass here please';
+$form->legend='Some legend';
 		if($form->validate())
 		{
 	
