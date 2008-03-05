@@ -93,4 +93,25 @@ else
 }}}
 
 Again, fairly simple or not :)
-That's it for tonight
+
+== Example of Formation ==
+{{{
+		$form=new Formation;
+		
+		$input=new Element_Input('email');
+		//$input->class='opblazen';
+		$form->add_element('input','eddm');//->add_rule('Rule_Exact_Length',4);
+		$form->add_element($input->add_rule('Rule_Matches',$form['eddm']))->label()->set_text('email label ');
+		$form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
+		$form->add_element('input','edsdm')->add_rule('Rule_Email')->add_rule('Rule_Required');
+		$form->add_element('submit','Submit');
+		if($form->validate())
+		{
+	
+			echo 'yah';
+		}
+		else
+		{
+			echo $form;
+		}	
+}}}
