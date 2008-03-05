@@ -99,16 +99,16 @@ Again, fairly simple or not :)
 		$form=new Formation;
 		
 		$input=new Element_Input('email');
-		//$input->class='opblazen';
-		$form->add_element('input','eddm');//->add_rule('Rule_Exact_Length',4);
-		$form->add_element($input->add_rule('Rule_Matches',$form['eddm']))->label()->set_text('email label ');
+		$input->class='some_class';
+		$form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
+		$form->add_element($input->add_rule('Rule_Matches',$form['username']))->label()->set_text('email label ');
 		$form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
-		$form->add_element('input','edsdm')->add_rule('Rule_Email')->add_rule('Rule_Required');
+		$form->add_element('input','email')->add_rule('Rule_Email')->add_rule('Rule_Required');
 		$form->add_element('submit','Submit');
 		if($form->validate())
 		{
 	
-			echo 'yah';
+			echo 'validates';
 		}
 		else
 		{
