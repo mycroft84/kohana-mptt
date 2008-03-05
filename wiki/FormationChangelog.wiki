@@ -1,0 +1,6 @@
+#summary Changelog of Formation
+
+= Introduction =
+
+0.92 changes
+Major bugfixes
