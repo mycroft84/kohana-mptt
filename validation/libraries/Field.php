@@ -128,12 +128,25 @@ class Field_Core {
 			//Stop when field is empty
 			if(empty($this->value)&&$name!='Rule_Required')
 				break;
-							
-			if(!$rule->is_valid($this->value))
-			{
-				$rule->name=$this->name;
-				$this->add_error($name,$rule->get_message());
-			}
+
+				if($rule instanceof Rule_Upload_Required)
+				{
+					if(!$rule->is_valid($this->upload))
+					{
+						$rule->name=$this->name;
+						$this->add_error($name,$rule->get_message());
+					}						
+					
+				}
+				else
+				{
+					if(!$rule->is_valid($this->value))
+					{
+						$rule->name=$this->name;
+						$this->add_error($name,$rule->get_message());
+					}	
+				}
+
 		}	
 		foreach ($this->callbacks as $callback)
 		{

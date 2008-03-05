@@ -27,10 +27,7 @@ class Rule_Core {
 	{
 		if($arguments != null)
 		{
-			foreach($arguments as $key=>$argument)
-			{
-				$this->message_vars[$key]=$argument;
-			}			
+			$this->set_message_vars($arguments);		
 		}
 
 	}
@@ -65,4 +62,11 @@ class Rule_Core {
 		}
 		return str_replace('{value}',$this->value,$message);			
 	}
+	protected function set_message_vars($vars)
+	{
+		foreach($vars as $key=>$argument)
+		{
+			$this->message_vars[$key]=$argument;
+		}
+	}	
 }
