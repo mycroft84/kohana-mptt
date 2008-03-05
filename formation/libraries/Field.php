@@ -98,9 +98,10 @@ class Field_Core {
 		if($key=='name')
 			return false;
 			
-		if(isset($this->$key)&&$this->$key!=$value)
-		{
+		if($this->$key!=$value)
+		{	
 			$this->$key=$value;
+			pr($this->screen_name);
 		}
 		
 	}
@@ -127,12 +128,14 @@ class Field_Core {
 			
 			if(empty($this->value)&&$name!='Rule_Required')
 				continue;
-
+			
+			$field_name=($this->screen_name==null) ? $this->name : $this->screen_name;
+			pr($field_name);
 			if($rule instanceof Rule_Upload_Required)
 			{
 				if(!$rule->is_valid($this->upload))
 				{
-					$rule->name=$this->name;
+					$rule->name=$field_name;
 					$this->add_error($name,$rule->get_message());
 				}						
 				
@@ -141,7 +144,7 @@ class Field_Core {
 			{
 				if(!$rule->is_valid($this->value))
 				{
-					$rule->name=$this->name;
+					$rule->name=$field_name;
 					$this->add_error($name,$rule->get_message());
 				}	
 
@@ -502,7 +505,7 @@ class Field_Core {
 	 *
 	 * @return array
 	 */
-	public function error()
+	public function errors()
 	{
 		return $this->errors;
 	}	
