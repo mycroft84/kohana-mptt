@@ -23,7 +23,10 @@ class Element_Submit_Core extends Element_Input {
 				
 		return form::button($data);
 	}
-
+	public function label()
+	{
+		return '';
+	}
 	public function validate()
 	{
 		// Submit buttons do not need to be validated
