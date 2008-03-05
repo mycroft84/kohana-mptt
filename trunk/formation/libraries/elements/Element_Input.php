@@ -83,9 +83,11 @@ class Element_Input_Core extends Field {
 	 */
 	public function label()
 	{
+		$field_name=($this->screen_name==null) ? $this->name : $this->screen_name;
+		
 		if(!($this->label instanceof Element_Label))
 		{
-			$this->label=new Element_Label($this->name);
+			$this->label=new Element_Label($field_name);
 		}
 		return $this->label;
 	}
