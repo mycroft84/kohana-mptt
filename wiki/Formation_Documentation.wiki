@@ -1,4 +1,5 @@
 #summary Documentation of the Formation module
+#labels Featured,Documentation
 
 = Introduction =
 The Formation module is a replacement of the current validation library as well as the Forge library. It was created due to some specific needs of mine and developed as such. It has reached a state in which it might be beneficial to other users as well. 
@@ -27,6 +28,69 @@ First we use the Validation class without form generation. We have a form which 
 $_POST=new Validation($_POST);
 $_POST['username']->add_rule('Rule_Required');
 $_POST['password']->add_pre_filter('trim')->add_rule('Rule_Min_Length',8)->add_rule('Rule_Required');
+}}}
 
-WIP
+You see, it's easy. Normally the $_POST is filled by php and you use it, now you set some rules on it's keys and let it validate. If the form is submitted the constructor takes the $_POST values. If not you still create the fields in your validation and add the rules. Would work for $_GET as well of course.
 
+Other methods you can carry out on a $_POST field.
+ * add_rules, remove_rule, clear_rules
+ * add_post_filter, add_post_filters, remove_post_filter, clear_post_filters
+ * add_pre_filters etc.
+ * add_callback etc.
+ * get_value(), set_value(), get_name(), 
+ * get/set_screen_name (used for labels)
+ * error() returns array with one error with message
+ * add_error() mostly used internally but might be useful for callbacks
+ * remove_error()
+ * error_format() supply string with {message} as message placeholder
+ * get_error_format()
+ * set_language_file() set language file for all rules this field has (default: validation)
+ * validate() validates the field, returns boolean first pre-filters, rules, callbacks post-filters
+
+
+You can use also get and set the properties, only not name
+{{{
+$_POST['password']->screen_name='asdf';
+}}}
+
+You can at any time echo the object
+{{{
+echo $_POST['username'];
+}}}
+
+It's an array object, means you can sort it, count it, put it in a loop
+{{{
+$_POST->asort();
+count($_POST);
+}}}
+
+Fun he
+
+Ok, on to the Validation class
+
+=== Validation class ===
+Some of the class methods
+ * add_rule, rules, clear and all that as well as for callbacks and pre/post filters so you can attach a rule to whole league of fields
+ * error_format() set error format for all fields
+ * validate() validates all fields
+ * errors() returns array of fields with an error for each if there is one
+ * validate_parial(array of fieldnames) validate form partially 
+ * validate_partial_json same as above just returns a json boolean
+ * set_language_file() set language file for all rules in every field
+
+{{{
+$_POST=new Validation($_POST);
+$_POST['username']->add_rule('Rule_Required');
+$_POST['password']->add_pre_filter('trim')->add_rule('Rule_Min_Length',8)->add_rule('Rule_Required');
+if($_POST->validate())
+{
+ echo 'have fun';
+}
+else
+{
+ var_dump($_POST->errors();
+}
+}}}
+
+Again, fairly simple or not :)
+That's it for tonight
