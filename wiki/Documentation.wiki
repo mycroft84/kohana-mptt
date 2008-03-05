@@ -26,8 +26,6 @@ I think it is important to know how mptt works when using this class so you know
 == MPTT library==
 The MPTT library for Kohana makes it easier to work with nested sets. It takes care of most of the logic for you. Also, it works with the ORM library of Kohana and extends it. This means you can use the normal ORM syntax while working with nested sets. 
 
-*Note:* updating the fields in a table which are used for mptt or deleting records using the ORM syntax 'ORM->delete()' may jeopardize the integrity of the tree.
-
 *Note:* at present this library does not lock tables. This means the integrity of the tree might be at stake with multiple edits happening at once. 
 
 == Some notes on the jargon ==
@@ -221,7 +219,7 @@ Tree can be supplied to mptt->debug_tree();
 === delete_tree() ===
 Deletes an tree of the current scope, use with caution
 
-=== delete_node($children=true)===
+=== delete_node($children=true) ===
 Deletes current node and any children when $children is true. 
 It will not delete the children when $children is false and will then move up the children in the hierarchy. 
 
