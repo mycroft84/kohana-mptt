@@ -1,0 +1,32 @@
+#summary Documentation of the Formation module
+
+= Introduction =
+The Formation module is a replacement of the current validation library as well as the Forge library. It was created due to some specific needs of mine and developed as such. It has reached a state in which it might be beneficial to other users as well. 
+
+I would greatly appreciate feedback, comments, bugfixes etc.
+
+You can download the latest release from http://code.google.com/p/kohana-mptt/downloads/list or checkout the latest edition from the subversion repository.
+
+== Installation ==
+Before installation you should know how to work with Kohana else this might become difficult.
+
+You should extract the archive and put it into your modules folder. In your application/config/config.php you should enable this module. 
+
+== Documentation ==
+Now, you'll find several files in the formation folder: Field.php, Formation.php and Validation.php as well as a folder elements and a folder rules. As is usual in Kohana the files map to classes.
+
+The Field class stands for an input field in a form. Elements extend from this field, such as the Input element, Password element etc.. A field has rules for validation, these rules are found in the rules folder.
+
+The Validation class does just validation, it doesn't generate your forms. Formation class extends Validation and does generate your forms.
+
+*Note* I moved rules and elements in a subfolder for clarity. This means they cannot be autoloaded by Kohana unless you register a new autoloader. The Formation or Validation class usually do this but if you want to use elements or rules outside of these classes you should register the autoloader yourself. You can find it in Validation.php
+
+=== Your first form ===
+First we use the Validation class without form generation. We have a form which has to fields 'username' and 'password'.
+{{{
+$_POST=new Validation($_POST);
+$_POST['username']->add_rule('Rule_Required');
+$_POST['password']->add_pre_filter('trim')->add_rule('Rule_Min_Length',8)->add_rule('Rule_Required');
+
+WIP
+
