@@ -219,8 +219,8 @@ Tree can be supplied to mptt->debug_tree();
 === delete_tree() ===
 Deletes an tree of the current scope, use with caution
 
-=== delete_node($children=true) ===
-Deletes current node and any children when $children is true. 
+=== delete_node($children) ===
+Deletes current node and any children when $children is true. Default = true
 It will not delete the children when $children is false and will then move up the children in the hierarchy. 
 
 === delete_descendants() ===
