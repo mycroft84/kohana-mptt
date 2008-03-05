@@ -6,6 +6,9 @@ $lang = array
 	'error_format'  => 'Je foutbericht string moet de string {message} bevatten.',
 
 	// Algemene errors
+	// {name} fieldname
+	// {value} fieldvalue
+	
 	'unknown_error' 	=> 'Onbekende validatiefout bij het valideren van het %s veld.',
 	'rule_required'     => 'Het {name} veld is verplicht.',
 	'rule_min_length'   => 'Het {name} veld moet minstens {min_length} karakters lang zijn.',
@@ -24,10 +27,19 @@ $lang = array
 	'rule_alpha_numeric'=> 'Het {name} veld mag alleen maar alfanumerieke karakters of getallen bevatten.',
 	'rule_alpha'		=> 'Het {name} veld mag alleen maar alfanumerieke karakters bevatten.',
 
-	// Upload errors
-	'user_aborted'  => 'Het uploaden van het %s bestand werd afgebroken.',
-	'invalid_type'  => 'Het bestandstype van het %s bestand is niet toegestaan.',
-	'max_size'      => 'Het %s bestand dat je wilde uploaden is te groot. De maximum toegelaten grootte is %s.',
+	// Upload errors 
+	// {filename} - filename
+	// {type}     - filetype as given by browser (unsafe)
+	// {tmp_name}
+	// {error} 	  - error code http://nl.php.net/manual/en/features.file-upload.errors.php
+	// {size} 
+	// {max_bytes} - size in bytes, only rule_upload_size
+	// {max_size}
+	// {mimetype} - rule_upload_allowed
+	'rule_upload_allowed'  	=> 'Het bestandstype van het {filename} bestand is niet toegestaan.',
+	'rule_upload_size'      => 'Het {filename} bestand dat je wilde uploaden is te groot. De maximum toegelaten grootte is {bytes} bytes.',
+
+	//Not yet implemented
 	'max_width'     => 'Het %s upgeloade bestand is te groot: maximum toegelaten breedte is %spx.',
 	'max_height'    => 'Het %s upgeloade bestand is te groot: maximum toegelaten hoogte is %spx.',
 	'min_width'     => 'Het %s upgeloade bestand is te klein: minimum toegelaten breedte is %spx.',
