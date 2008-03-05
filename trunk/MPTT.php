@@ -55,6 +55,29 @@ class MPTT extends ORM {
 		
 	}
 
+	//////////////////////////////////////////
+	//  Lock functions
+	//////////////////////////////////////////
+
+	/**
+	 * Locks tree table
+	 * This is a straight write lock - the database blocks until the previous lock is released
+	 */
+	protected function lock_tree($aliases = array())
+	{
+		$sql = "LOCK TABLE " . $this->table . " WRITE";
+		return self::$db->query($sql);
+	}
+
+	/**
+	 * Unlocks tree table
+	 * Releases previous lock
+	 */
+	protected function unlock_tree()
+	{
+		$sql = "UNLOCK TABLES";
+		return self::$db->query($sql);
+	}
 
 	/**
 	* Bit of an odd function since the node is supplied
@@ -367,9 +390,10 @@ class MPTT extends ORM {
 		//Get scope from current object (obsolete)
 		$this->$scp_col=$this->get_scope();
 		
+		$this->lock_tree();
 		$this->modify_node($this->$lft_col,2);
 		$this->save_node();
-
+		$this->unlock_tree();
 		
 		return $this;
 	}
@@ -393,8 +417,10 @@ class MPTT extends ORM {
 		$this->$rgt_col=$parent_node->$rgt_col+1;
 		$this->$scp_col=$this->get_scope();                
 		
+		$this->lock_tree();		
 		$this->modify_node($this->$lft_col,2);
 		$this->save_node();
+		$this->unlock_tree();
 		
 		return $this;
 	}   
@@ -418,8 +444,10 @@ class MPTT extends ORM {
 		$this->$rgt_col=$focus_node->$lft_col+1; 
 		$this->$scp_col=$this->get_scope();        
 		
+		$this->lock_tree();		
 		$this->modify_node($this->$lft_col,2);
 		$this->save_node();
+		$this->unlock_tree();		
 			
 		return $this;
 	}     
@@ -442,9 +470,11 @@ class MPTT extends ORM {
 		$this->$lft_col=$focus_node->$rgt_col+1;
 		$this->$rgt_col=$focus_node->$rgt_col+2; 
 		$this->$scp_col=$this->get_scope();           
-						
+
+		$this->lock_tree();		
 		$this->modify_node($this->$lft_col,2);
 		$this->save_node();
+		$this->unlock_tree();		
 			
 		return $this;
 	}    
@@ -491,10 +521,12 @@ class MPTT extends ORM {
 					AND '. $rightcol .' <= ' . $rightval . ' 
 					AND '. $this->scope_column .' = '.$this->get_scope() ;  
 			
+			$this->lock_tree();
 			//Delete node and children              
 			self::$db->delete($this->table, $where);
 			//Modify other nodes to restore tree integrity
 			$this->modify_node($rightval+1, $leftval  - $rightval - 1);
+			$this->unlock_tree();
 		}
 		else
 		{
@@ -502,6 +534,7 @@ class MPTT extends ORM {
 				Log::add('error', 'Cannot delete root node without deleting its children' );
 				return false;
 			}
+			$this->lock_tree();
 			//Get children before the parent is gone
 			//Set parent ids right again
 			$parent_node=$this->get_node($this->$parent_column);
@@ -545,6 +578,7 @@ class MPTT extends ORM {
 					$child->save_node();
 				}
 			}
+			$this->unlock_tree();
 
 		}
 
@@ -559,12 +593,14 @@ class MPTT extends ORM {
 	*/
 	function delete_descendants()
 	{
+		$this->lock_tree();
 		$this->get_children();
 		foreach($this->children as $child)
 		{
 			$child->delete_node();
 			
 		}
+		$this->unlock_tree();
 		$this->children=array();
 		return true;  
 	}
@@ -581,6 +617,7 @@ class MPTT extends ORM {
 			$child->delete_node(false);
 			
 		}
+		$this->unlock_tree();
 		$this->children=array();
 		return true;          
 	}
@@ -799,22 +836,23 @@ class MPTT extends ORM {
 	*/
 	function is_child_of($control_node)
 	{   
-			$child_id=$this->id;
-			$parent_id=$control_node->id;
-			
-			self::$db->select('count(*) as is_child');
-			self::$db->from($this->table);       
-			self::$db->where('id',$child_id);          
-			self::$db->where($this->parent_column,$parent_id);                 
-			self::$db->where($this->scope_column, $this->get_scope());
-			
-			$result=self::$db->get(); 
-			
-			if ($row = $result->current()) {
-				return $row->is_child > 0;
-			}
+		$child_id=$this->id;
+		$parent_id=$control_node->id;
+		
+		self::$db->select('count(*) as is_child');
+		self::$db->from($this->table);       
+		self::$db->where('id',$child_id);          
+		self::$db->where($this->parent_column,$parent_id);                 
+		self::$db->where($this->scope_column, $this->get_scope());
+		
+		$result=self::$db->get(); 
+		
+		if ($row = $result->current()) 
+		{
+			return $row->is_child > 0;
+		}
 
-			return false;
+		return false;
 		
 	}    
 	
@@ -958,34 +996,37 @@ class MPTT extends ORM {
 	* @param $left Object
 	*/
 	function rebuild_tree($parent_id, $left) {
-	// the right value of this node is the left value + 1
-	$right = $left+1;
+		$this->lock_tree();
+		// the right value of this node is the left value + 1
+		$right = $left+1;
 	
-	// get all children of this node
+		// get all children of this node
 		self::$db->select('id');                            
 		self::$db->where($this->parent_column, $parent_id);
 		self::$db->where($this->scope_column, $this->get_scope());
 		self::$db->from($this->table);
 		$result=self::$db->get();
 		
-	foreach ($result as $row) {
-		// recursive execution of this function for each
-		// child of this node
-		// $right is the current right value, which is
-		// incremented by the rebuild_tree function
-		$right = $this->rebuild_tree($row->id, $right);
-	}
-	
-	// we've got the left value, and now that we've processed
-	// the children of this node we also know the right value
+		foreach ($result as $row) {
+			// recursive execution of this function for each
+			// child of this node
+			// $right is the current right value, which is
+			// incremented by the rebuild_tree function
+			$right = $this->rebuild_tree($row->id, $right);
+		}
+		
+		// we've got the left value, and now that we've processed
+		// the children of this node we also know the right value
 			
 		self::$db->set($this->left_column, $left);
 		self::$db->set($this->right_column, $right);
 		self::$db->where('id',$parent_id);
 		self::$db->where($this->scope_column, $this->get_scope());
 		self::$db->update($this->table);
-	// return the right value of this node + 1
-	return $right+1;
+		// return the right value of this node + 1
+		return $right+1;
+		
+		$this->unlock_tree();
 	} 
 	
 	/*
