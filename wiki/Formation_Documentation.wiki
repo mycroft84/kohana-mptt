@@ -147,7 +147,7 @@ $form->add_element($input)->label()->set_text('email label ');
 }}}
 
 This means there are two syntaxes
-{{{
+
 {{{
 $form->add_element(new Element_Input('name'));
 $form->add_element('input','name');
