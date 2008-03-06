@@ -1,5 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+
 class Formation_Core extends Validation{
 	
 	// Form attributes

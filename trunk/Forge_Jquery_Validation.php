@@ -1,11 +1,11 @@
 <?php
-class Jquery_Validation_Core extends ArrayObject {
+class Forge_Jquery_Validation_Core extends ArrayObject {
 	
 	protected $form;
 	//Factory, useful for chaining
 	public static function factory($form=null)
 	{
-		return new Jquery_Validation($form);
+		return new Forge_Jquery_Validation($form);
 	}
 	//takes forge object as argument
 	public function __construct($form =null)

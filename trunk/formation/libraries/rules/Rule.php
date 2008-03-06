@@ -31,7 +31,6 @@
 		}
 
 	}
-	
 	public function set_language_file($file)
 	{
 		$this->language_file=$file;
