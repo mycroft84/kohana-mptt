@@ -23,6 +23,8 @@ class Formation_Core extends Validation{
 	public function __construct($legend='Form')
 	{
 		$this->template_vars['legend']=$legend;
+		// Set the new attribute
+		$this->set_attr('id',$legend);		
 		// Set element autoloader
 		spl_autoload_register(array('Validation', 'auto_load'));		
 
@@ -391,6 +393,14 @@ class Formation_Core extends Validation{
 	{
 		return $this->get_attr('action');
 	}	
+	public function set_class($class)
+	{
+		$this->set_attr('class',$class);
+	}
+	public function set_id($id)
+	{
+		$this->set_attr('id',$id);
+	}
 	/**
 	 * set values of the form e.g. form db
 	 *
@@ -408,5 +418,6 @@ class Formation_Core extends Validation{
 		}
 		return $this;
 	}	
+	
 }
 ?>
