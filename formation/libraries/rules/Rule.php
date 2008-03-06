@@ -43,12 +43,11 @@
 	public function get_message()
 	{
 		$message=Kohana::lang($this->language_file.'.'.strtolower(get_class($this)));
-		
+			
 		if($this->message!=null)
 		{
 			$message=$this->message;	
 		}
-			
 		$message=$this->parse_message($message);
 		
 		return $message;

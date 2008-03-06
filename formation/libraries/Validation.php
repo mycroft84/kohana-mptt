@@ -4,6 +4,9 @@ class Validation_Core extends ArrayObject{
 	// Errors
 	protected $errors = array();
 
+	protected $js_validate;
+	
+	protected $js_validator;
 	/**
 	 * Pass the array you need to validate, e.g. $_POST
 	 * 
@@ -454,6 +457,14 @@ class Validation_Core extends ArrayObject{
 		{
 			$field->set_language_file($file);
 		}
+	}
+	public function register_js_validator($validator)
+	{
+		$this->js_validate=new $validator($this);
+	}
+	public function js_validate()
+	{
+		return $this->js_validate;
 	}
 } // End Validation
 

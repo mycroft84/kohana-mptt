@@ -210,7 +210,7 @@ class Field_Core {
 		$this->screen_name=$name;
 		return $this;
 	}
-	public function get_screen_name($name)
+	public function get_screen_name()
 	{
 		return $this->screen_name;
 	}
