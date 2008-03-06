@@ -113,7 +113,7 @@ else
 {
   echo $form; //will call $form->render()
 }
-
+}}}
 You can see I create an instance of the form, set it's method and id add one element with a rule. Then I try to validate it, if it fails it renders the form.
 
 The class renders a view with the form. This view or template can be found in formation/views/formation_template.php You can change the template with 
