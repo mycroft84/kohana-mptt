@@ -48,19 +48,13 @@ class Field_Core {
 	 * @param unknown_type $value
 	 * @param Validate $validation_object
 	 */
-	public function __construct($name,$value=null,Validation $validation_object=null)
+	public function __construct($name,$value=null)
 	{
 		
 		$this->name=$name;
 		$this->value=$value;
 		$this->unfiltered_value=$value;
-		
-		//Pass validation object for callbacks
-		if($validation_object!=null)
-		{
-			$this->validation=$validation_object;
-		}
-		
+
 	}
 
 	/**
@@ -130,7 +124,7 @@ class Field_Core {
 				continue;
 			
 			$field_name=($this->screen_name==null) ? $this->name : $this->screen_name;
-			pr($field_name);
+			
 			if($rule instanceof Rule_Upload_Required)
 			{
 				if(!$rule->is_valid($this->upload))

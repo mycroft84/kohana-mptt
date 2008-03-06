@@ -1,4 +1,7 @@
-<?php echo $open; ?>
+<?php echo $open; ?><?php foreach($inputs as $input): 
+							if($input instanceof Element_Hidden) 
+							$input->render(); 
+						  endforeach;?>
 	<fieldset>	
 		<ol>
 		<?php if ($legend != ''): 

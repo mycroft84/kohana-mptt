@@ -77,6 +77,16 @@ class Element_Input_Core extends Field {
 		return false;
 	}
 	/**
+	 * Set size attribute
+	 *
+	 * @param unknown_type $size
+	 * @return unknown
+	 */
+	public function set_size($size)
+	{
+		return $this->set_attr($size);
+	}
+	/**
 	 * Returns instance of a label
 	 *
 	 * @return unknown
