@@ -38,13 +38,13 @@ Other methods you can carry out on a $_POST field.
  * add_pre_filters etc.
  * add_callback etc.
  * get_value(), set_value(), get_name(), 
- * get/set_screen_name (used for labels)
+ * get/set_screen_name (it's the name of the field used in labels or errors)
  * error() returns array with one error with message
  * add_error() mostly used internally but might be useful for callbacks
  * remove_error()
  * error_format() supply string with {message} as message placeholder
  * get_error_format()
- * set_language_file() set language file for all rules this field has (default: validation)
+ * set_language_file() set language file for all rules this field has (default: validation which maps to i18n/language/validation.php
  * validate() validates the field, returns boolean first pre-filters, rules, callbacks post-filters
 
 
@@ -94,29 +94,153 @@ else
 
 Again, fairly simple or not :)
 
-== Example of Formation ==
+== Formation class ==
+Works pretty similar to the Validation class when it comes to adding rules, filters and callbacks. Every Element inherits from the Field class so all those methods are available.
+
+=== First form===
 {{{
-		$form=new Formation;
+$form=new Formation;
+$form->set_method('POST'); //is default but still
+$form->set_attrib('id','form_css_id');
+
+$form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
+
+if($form->validate())
+{
+  echo 'yah';
+}
+else
+{
+  echo $form; //will call $form->render()
+}
+
+You can see I create an instance of the form, set it's method and id add one element with a rule. Then I try to validate it, if it fails it renders the form.
+
+The class renders a view with the form. This view or template can be found in formation/views/formation_template.php You can change the template with 
+{{{
+$form->set_template('your_template');
+}}}
+get_template() retrieves the template.
+
+You might have some variables in your template that you want to fill. By default there is an $legend variable. You can set variables in your template like this, just like views in Kohana.
+{{{
+$form->legend='your legend';
+$form->some_var='some value';
+}}}
+
+Formation extends Validation so the Validation methods are also available in the Formation class. 
+==== Elements ====
+Like seen in the example above you can add elements. 
+Related methods
+ * add_elements
+ * remove_element
+ * clear_elements
+
+You can also add elements like this
+{{{
+$input=new Element_Input('email');
+$input->class='some_class';
+$input->set_attr('id','some_id')
+      ->add_rule('Rule_Matches',$form['username']);
+
+$form->add_element($input)->label()->set_text('email label ');
+}}}
+
+This means there are two syntaxes
+{{{
+{{{
+$form->add_element(new Element_Input('name'));
+$form->add_element('input','name');
+}}}
+Elements you can add
+ * Element_Checkbox 
+ * Element_Checklist
+ * Element_Dropdown
+ * Element_Group
+ * Element_Hidden
+ * Element_Input
+ * Element_Label (not really an element, is covered later)
+ * Element_Password
+ * Element_Submit
+ * Element_Textarea
+ * Element_Upload
+
+===== Label =====
+Labels are special. See example
+{{{
+$form->add_element('input','name')->label()->set_attr('id','someid')->set_text('some text');
+}}}
+label() returns an object label of which you can set the attributes and text.
+
+===== Special elements =====
+Some elements have special methods. Check the source.
+$form->add_element('upload','load_file')->set_directory('some_dir');
+
+==== Groups ====
+Groups also work as elements but do not extend Element_Input but Formation. The default template renders them within a <fieldset> element. You can nest them.
+
+{{{
+$form->add_element('input','email');
+$form->add_group(array('email'),'group1');
+
+$form['group1']->add_element('password','Password field')->add_rule('Rule_Min_Length',8);
+$form['group1']->add_group(array(),'group2');
+$form['group1']['group2']->add_element('input','sth');
+}}}
+The first argument of the add_group method can be a string or array with the names of elements, or elements themselves. If they are names they will be retrieved from the group's parents and moved to the group. Else, they will simply be added. Only the parent's elements are searched for, grandparents are not.
+
+Groups extend Formation so many Formation methods are valid here. The default template for groups is the same as for Formation.
+
+=== Rules, callbacks and filters ===
+Callbacks and filters are all callbacks. 
+
+==== Rules ====
+Rules are the following
+ * Rule_Alpha
+ * Rule_Alpha_Numeric
+ * Rule_Array
+ * Rule_Depends_On
+ * Rule_Digit
+ * Rule_Email
+ * Rule_Exact_Length
+ * Rule_Ip
+ * Rule_Length
+ * Rule_Matches
+ * Rule_Max_Length
+ * Rule_Min_Length
+ * Rule_Numeric
+ * Rule_Range
+ * Rule_Regex
+ * Rule_Required
+ * Rule_Upload_Allowed
+ * Rule_Upload_Required
+ * Rule_Upload_Size
+ * Rule_Url
+
+Some accept arguments, you can also set the error message, language file. In the language files that come with Formation you can see the syntax used. 
+
+== Example of Formation ==
+A complete example
+{{{
+$form=new Formation;
 		
-		$input=new Element_Input('email');
-		$input->class='some_class';
-		$form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
-		$form->add_element($input->add_rule('Rule_Matches',$form['username']))->label()->set_text('email label ');
-		$form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
+
+$form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
+
+$form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
 		$form->add_element('input','email')->add_rule('Rule_Email')->add_rule('Rule_Required');
 $form->add_group(array('username'),'group1');
 $form['group1']->add_element('password','Password field')->add_rule('Rule_Min_Length',8);
 
-		$form->add_element('submit','Submit');
+$form->add_element('submit','Submit');
 $form['group1']->legend='User/pass here please';
 $form->legend='Some legend';
-		if($form->validate())
-		{
-	
-			echo 'validates';
-		}
-		else
-		{
-			echo $form;
-		}	
+if($form->validate())
+{
+	echo 'validates';
+}
+else
+{
+	echo $form;
+}	
 }}}
