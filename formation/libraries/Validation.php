@@ -19,7 +19,7 @@ class Validation_Core extends ArrayObject{
 		//For each field make an object
 		$array_object=array();
 		
-		$this->setFlags(ArrayObject::ARRAY_AS_PROPS);
+		$this->setFlags(ArrayObject::STD_PROP_LIST );
 		
 		foreach($array as $key=>$value)
 		{	
@@ -30,6 +30,7 @@ class Validation_Core extends ArrayObject{
 		//Register auto load for rules and elements
 		spl_autoload_register(array('Validation', 'auto_load'));
 		
+		Log::add('debug', 'Validation library initialized');
 			
 	}
 	/**
