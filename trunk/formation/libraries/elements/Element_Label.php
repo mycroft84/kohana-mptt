@@ -16,6 +16,7 @@ class Element_Label_Core extends Element_Input {
 		}
 		$this->set_text($text);
 	}
+	
 	public function set_text($text)
 	{
 		$this->text=$text;

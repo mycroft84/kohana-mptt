@@ -27,6 +27,8 @@ class Formation_Core extends Validation{
 		$this->set_attr('id',$legend);		
 		// Set element autoloader
 		spl_autoload_register(array('Validation', 'auto_load'));		
+		
+		Log::add('debug', 'Formation library initialized');
 
 	}
 	/**
@@ -396,10 +398,12 @@ class Formation_Core extends Validation{
 	public function set_class($class)
 	{
 		$this->set_attr('class',$class);
+		return $this;
 	}
 	public function set_id($id)
 	{
 		$this->set_attr('id',$id);
+		return $this;
 	}
 	/**
 	 * set values of the form e.g. form db
