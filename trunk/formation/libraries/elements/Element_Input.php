@@ -12,7 +12,18 @@ class Element_Input_Core extends Field {
 
 	// Message output format
 	protected $message_format = '{message}';
-	
+
+	//TODO implement support for passing array with all properties,
+	// possible needed in other elements as well
+	// 
+	public function __construct($name,$value=null)
+	{
+		
+		$this->name=$name;
+		$this->value=$value;
+		$this->unfiltered_value=$value;
+
+	}
 	/**
 	 * Magically gets a variable.
 	 *
@@ -103,6 +114,7 @@ class Element_Input_Core extends Field {
 		{
 			$this->label=new Element_Label($this->name);
 			$this->label->set_text(utf8::ucwords(inflector::humanize($field_name)).' ');
+			$this->label->id='id_'.$this->name;
 		}
 		return $this->label;
 	}

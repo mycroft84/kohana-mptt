@@ -1,6 +1,6 @@
 <?php echo $open; ?><?php foreach($inputs as $input): 
 							if($input instanceof Element_Hidden) 
-							$input->render(); 
+							echo $input->render()."\n"; 
 						  endforeach;?>
 	<fieldset>	
 		<ol>
@@ -16,21 +16,16 @@
 				?>	</li>
 				<?php
 			else:
-				if($input instanceof Element_Hidden):
-					echo $input->render();
-					
-				else: 
-					if ($label = $input->label()): 
-						?>	<li><?php echo $input->label(); 
-					endif; 
-						echo $input->render(); 
+				if ($label = $input->label()): 
+					?>	<li><?php echo $input->label(); 
+				endif; 
+					echo $input->render(); 
 
-					if(($error_message=$input->error_message()) !== false):
-			
-						?><label class="error" for="<?=$input->name?>"><?=$error_message ?></label><?php
-					endif; ?></li>
+				if(($error_message=$input->error_message()) !== false):
+		
+					?><label class="error" for="<?=$input->name?>"><?=$error_message ?></label><?php
+				endif; ?></li>
 		<?php 
-				endif;
 			endif;
 		
 		endforeach; ?>
