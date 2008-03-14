@@ -102,7 +102,7 @@ Works pretty similar to the Validation class when it comes to adding rules, filt
 {{{
 $form=new Formation;
 $form->set_method('POST'); //is default but still
-$form->set_attrib('id','form_css_id');
+$form->set_attr('id','form_css_id');
 
 $form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
 
@@ -202,10 +202,10 @@ Rules are the following
  * Rule_Alpha
  * Rule_Alpha_Numeric
  * Rule_Array
- * Rule_Csrf - no need to call manually
+ * Rule_Csrf - no need to call manually, is included in Element_Csrf
  * Rule_Depends_On
  * Rule_Digit
- * Rule_Email
+ * Rule_Email //is included in Element_Email
  * Rule_Exact_Length
  * Rule_Ip
  * Rule_Length
@@ -223,12 +223,27 @@ Rules are the following
 
 Some accept arguments, you can also set the error message, language file. In the language files that come with Formation you can see the syntax used. 
 
+== Storing forms ==
+Using a form class you can store forms and use the throughout your application.
+*Example: My_Form.php*
+{{{
+class My_Form_Core extends Formation{
+   public function __construct()
+   {
+      parent::__construct();
+      $this->legend='Some legend';
+      $this->add_element('input','email')->add_rule('Rule_Required');
+      $this->add_element('input','username')->add_rule('Rule_Required');
+      $this->add_element('submit','Submit');
+   }
+}
+}}}
+Now loading the object is as easy as `$form=new My_Form; $form->render();`
 == Example of Formation ==
 A complete example
 {{{
 $form=new Formation;
 		
-
 $form->add_element('input','username')->add_rule('Rule_Exact_Length',4);
 
 $form->add_element('upload','load')->add_rule('Rule_Upload_Size',1050);
