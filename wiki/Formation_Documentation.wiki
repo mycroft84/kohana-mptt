@@ -8,6 +8,7 @@ I would greatly appreciate feedback, comments, bugfixes etc.
 
 You can download the latest release from http://code.google.com/p/kohana-mptt/downloads/list or checkout the latest edition from the subversion repository.
 
+If you're looking for documentation on ModelToForm , follow the link. ModelToForm is a way to have forms generated from your models. It's a wIP.
 == Installation ==
 Before installation you should know how to work with Kohana else this might become difficult.
 
@@ -156,7 +157,9 @@ Elements you can add
  * Element_Checkbox 
  * Element_Checklist
  * Element_Dropdown
- * Element_Group
+ * Element_Email -  same as input but comes with the email rule
+ * Element_Csrf - cross site request forgery protection
+ * Element_Group - put some elements between <fieldset>
  * Element_Hidden
  * Element_Input
  * Element_Label (not really an element, is covered later)
@@ -199,6 +202,7 @@ Rules are the following
  * Rule_Alpha
  * Rule_Alpha_Numeric
  * Rule_Array
+ * Rule_Csrf - no need to call manually
  * Rule_Depends_On
  * Rule_Digit
  * Rule_Email
