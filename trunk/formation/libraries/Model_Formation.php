@@ -10,6 +10,8 @@ class Model_Formation_Core extends Formation{
 	//Which fields to include
 	protected $form_fields=array();
 	
+	protected $not_editable=array();
+	
 	public function __construct($model=false,$guess_fields=true)
 	{
 		parent::__construct();

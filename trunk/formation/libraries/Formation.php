@@ -130,8 +130,14 @@ class Formation_Core extends Validation{
 			if ($name==null)
 				throw new Kohana_Exception('formation.invalid_rule', get_class($rule));
 				
+				$args=null;
+				if(count($args=func_get_args())>2)
+				{
+					$args=array_slice($args,2);
+				}
+			
 			$type='Element_'.ucfirst(strtolower($type));
-			$this[$name]=new $type($name);	
+			$this[$name]=new $type($name,$args);	
 		}
 		return $this[$name];
 	}
