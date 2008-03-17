@@ -23,7 +23,7 @@ protected $_model='User_Model';
 
 Example of the model
 {{{
-class User_Model{
+class User_Model extends ORM{
 	protected $validate=array(
 				'rules'=>array	(
 					'titel'=>array	('Rule_Required',                 array('Rule_Length',array(5,10))
