@@ -10,9 +10,9 @@ class Model_Formation_Core extends Formation{
 	//Which fields to include
 	protected $form_fields=array();
 	
-	protected $not_editable=array();
+	protected $disabled=array();
 	
-	public function __construct($model=false,$guess_fields=true)
+	public function __construct($model=false)
 	{
 		parent::__construct();
 		
@@ -31,30 +31,36 @@ class Model_Formation_Core extends Formation{
 		{
 			$this->_model=$model;				
 		}
-
-		
-		
-		$this->build_form($guess_fields);
+	
+		$this->build_form();
 	}
 	/**
 	 * Build form
 	 *
 	 * @param boolean $guess_fields, automatic field determination
 	 */
-	protected function build_form($guess_fields=true)
+	protected function build_form()
 	{
-		//pr($this->_model->field_data());
-		foreach($this->_model->field_data() as $name=>$property)
+		//Get field types and rules, filters everything
+		$validate=$this->_model->get_validate();
+				
+		foreach($this->_model->list_fields() as $name=>$property)
 		{
 			if(in_array($name,$this->exclude))
 				continue;
 
 			if($this->form_fields!=array() and !in_array($name,$this->form_fields))
 				continue;
-				
 			
+			//By default all fields are input
 			$type='input';
-			if($guess_fields==true)
+
+
+			if(isset($validate[$name]['type']))
+			{
+				$this->add_element($validate[$name]['type'],$name);
+			}
+			else
 			{
 				//Try to guess field type given the database information
 				if($property['type']=='string' AND !isset($property['length']))
@@ -65,31 +71,25 @@ class Model_Formation_Core extends Formation{
 				{
 					$type='input';
 				}
-				($name=='email') ?	$type='email' : null;	
+	
+				//Adding elements
+				$this->add_element($type,$name);				
 			}
 
-			$custom_field_data=$this->_model->get_custom_field_data();
-		
-			if(isset($custom_field_data[$name]))
+			if(in_array($name,$this->disabled))
 			{
-				$type=$custom_field_data[$name];
+				$this[$name]->set_attr('disabled','disabled');
 			}
-			//Adding elements
-			$this->add_element($type,$name);
-			
-			//Setting rules, callbacks, filters
-			$validate=$this->_model->get_validate();
-			
-			if(isset($validate['pre_filters'][$name]))
+			if(isset($validate[$name]['pre_filters']))
 			{
-				foreach($validate['pre_filters'][$name] as $filter)
+				foreach($validate[$name]['pre_filters'] as $filter)
 				{
 						$this[$name]->add_pre_filter($filter);
 				}
 			}				
-			if(isset($validate['rules'][$name]))
+			if(isset($validate[$name]['rules']))
 			{
-				foreach($validate['rules'][$name] as $rule)
+				foreach($validate[$name]['rules'] as $rule)
 				{
 					//array for when you give arguments to a rule
 					if(is_array($rule))
@@ -100,27 +100,27 @@ class Model_Formation_Core extends Formation{
 					}
 				}
 			}
+			if(isset($validate[$name]['callbacks']))
+			{
+				foreach($validate[$name]['callbacks'] as $callback)
+				{
+					$this[$name]->add_callback($callback);
+				}
+			}	
+			if(isset($validate[$name]['post_filters']))
+			{
+				foreach($validate[$name]['post_filters'] as $filter)
+				{
+						$this[$name]->add_post_filter($filter);
+				}
+			}	
+
 			//Additional rules retrieved from database
 			if(isset($property['length']))
 			{
 				$this[$name]->add_rule('Rule_Max_Length',$property['length']);
 			}
-			
-			if(isset($validate['callbacks'][$name]))
-			{
-				foreach($validate['callbacks'][$name] as $callback)
-				{
-					$this[$name]->add_callback($callback);
-				}
-			}	
-			if(isset($validate['post_filters'][$name]))
-			{
-				foreach($validate['post_filters'][$name] as $filter)
-				{
-						$this[$name]->add_post_filter($filter);
-				}
-			}	
-			
+						
 			//If model exists at its values to the fields
 			if($this->_model->exists())
 			{

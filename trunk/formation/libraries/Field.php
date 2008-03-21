@@ -36,11 +36,6 @@ class Field_Core {
 	//Custom error messages, if none defaults to Kohana i18n validation.php
 	protected $error_messages=array();
 	
-	//Validation object, useful for callbacks
-	protected $validation;
-	
-	protected $required=false;
-	
 	/**
 	 * Construct 
 	 *
@@ -95,7 +90,6 @@ class Field_Core {
 		if($this->$key!=$value)
 		{	
 			$this->$key=$value;
-			pr($this->screen_name);
 		}
 		
 	}
@@ -113,7 +107,7 @@ class Field_Core {
 		foreach ($this->pre_filters as $filter)
 		{
 			//Filter value, or every value of an array
-			$this->value = is_array($this->value) ? array_map($filter, $this->value) : call_user_func($filter, $this->value);
+			$this->value =  call_user_func($filter, $this->value);
 		}	
 		foreach($this->rules as $name=>$rule)
 		{
@@ -157,7 +151,7 @@ class Field_Core {
 		foreach ($this->post_filters as $filter)
 		{
 			//Filter value, or every value of an array
-			$this->value = is_array($this->value) ? array_map($filter, $this->value) : call_user_func($filter, $this->value);
+			$this->value = call_user_func($filter, $this->value);
 		}	
 		
 		$this->is_valid=(count($this->errors) === 0);
@@ -210,6 +204,11 @@ class Field_Core {
 		$this->screen_name=$name;
 		return $this;
 	}
+	/**
+	 * Retrieve screen name
+	 *
+	 * @return string
+	 */
 	public function get_screen_name()
 	{
 		return $this->screen_name;
