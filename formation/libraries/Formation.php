@@ -102,8 +102,13 @@ class Formation_Core extends Validation{
 			{
 				if(!($field instanceof Element_Group))
 				{
-					//Load value if present
-					$this[$name]->load_value(Input::instance()->$method($name));	
+					//Prevent disabled elements from being set
+					if($this[$name]->get_attr('disabled')!='disabled')
+					{
+						//Load value if present
+						$this[$name]->load_value(Input::instance()->$method($name));								
+					}
+
 				}
 			}
 			return true;
@@ -129,12 +134,15 @@ class Formation_Core extends Validation{
 		{
 			if ($name==null)
 				throw new Kohana_Exception('formation.invalid_rule', get_class($rule));
-				
+
+			if(count($args=func_get_args())>2)
+			{
+				$args=array_slice($args,2);
+			}
+			else
+			{
 				$args=null;
-				if(count($args=func_get_args())>2)
-				{
-					$args=array_slice($args,2);
-				}
+			}
 			
 			$type='Element_'.ucfirst(strtolower($type));
 			$this[$name]=new $type($name,$args);	
