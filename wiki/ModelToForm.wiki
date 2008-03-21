@@ -18,6 +18,8 @@ protected $form_fields=array();
 //Which model this form takes after
 protected $_model='User_Model';
 
+protected $disabled=array('modified'); //shows the form field but disabled so it can't be edited.
+
 }
 }}}
 
@@ -25,15 +27,20 @@ Example of the model
 {{{
 class User_Model extends ORM{
 	protected $validate=array(
-				'rules'=>array	(
-					'titel'=>array	('Rule_Required',                 array('Rule_Length',array(5,10))
-               				 		)
-		         			)
-				);
-								
-	protected $custom_field_data=array
-        (
-	'some_email'=>'email'
+	'name'=>array(	
+		'rules'=>array(array('Rule_Max_Length',50)),
+		'pre_filters'=>array('ucfirst')
+		
+		),
+	'email'=>array(
+		'type'=>'email',
+		'rules'=>array('Rule_Required'),
+		),
+	'preference'=>array(
+		'type'=>'checklist',
+		),
+	'comment'=>	array(
+		'pre_filters'=>array('trim'))
 	);
 }
 }}}
