@@ -100,7 +100,7 @@ class Validation_Core extends ArrayObject{
 	{
 		if(!($value instanceof Element_Input) && !($value instanceof Element_Group))
 		{
-			$value=new Field($key,$value);
+			$value=new Form_Field($key,$value);
 		}
 		parent::offsetSet($key,$value);
 		

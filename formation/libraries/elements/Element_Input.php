@@ -1,6 +1,6 @@
 <?php
 
-class Element_Input_Core extends Field {
+class Element_Input_Core extends Form_Field {
 	
 	protected $attr=array
 	(
@@ -114,7 +114,7 @@ class Element_Input_Core extends Field {
 		{
 			$this->label=new Element_Label($this->name);
 			$this->label->set_text(utf8::ucwords(inflector::humanize($field_name)).' ');
-			$this->label->id='id_'.$this->name;
+			
 		}
 		return $this->label;
 	}

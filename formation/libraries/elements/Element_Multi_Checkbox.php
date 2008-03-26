@@ -1,37 +1,5 @@
-<?php defined('SYSPATH') or die('No direct script access.');
-
-class Element_Checklist_Core extends Element_Input {
-
-	protected $options=array();
-	
-	protected $attr=array(
-	'class'=>'checklist',
-	);
-	public function __get($key)
-	{
-		if($key=='value')
-		{
-			return $this->get_value();
-		}
-		return parent::__get($key);
-	}
-	public function __set($key,$value)
-	{
-		if($key=='value')
-		{
-			return $this->set_value($value);
-		}
-		return parent::__set($key,$value);
-	}
-	public function set_options($options)
-	{
-		$this->options=$options;
-		return $this;		
-	}
-	public function get_options($options)
-	{
-		$this->options;
-	}
+<?php
+class Element_Multi_Checkbox_Core extends Element_Multi{
 	public function render()
 	{
 		// Import base data
@@ -55,7 +23,7 @@ class Element_Checklist_Core extends Element_Input {
 			// Set the name, value, and checked status
 			$data['value']   = $val;
 			$data['checked'] = $checked;
-		
+			//TODO Element_Checkboxes
 			$checklist .= "\t".'<li><label>'.form::checkbox($data).' '.$title.'</label></li>'.$nl;
 		}
 		$checklist .= '</ul>';
@@ -86,5 +54,6 @@ class Element_Checklist_Core extends Element_Input {
 				$this->options[$val][1] = FALSE;
 			}
 		}
-	}
+	}		
 }
+?>

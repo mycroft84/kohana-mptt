@@ -124,7 +124,7 @@ class Formation_Core extends Validation{
 	 */
 	public function add_element($type,$name=null)
 	{
-		if($type instanceof Field && $name==null)
+		if($type instanceof Form_Field && $name==null)
 		{
 			$name=$type->get_name();
 			
@@ -300,6 +300,21 @@ class Formation_Core extends Validation{
 		return $this->template;
 	}
 	/**
+	 * Test for this form being multipart
+	 */
+	public function is_multipart()
+	{
+		// See if we need a multipart form
+		foreach ($this as $input)
+		{
+			if ($input instanceof Element_Upload)
+			{
+				return true;
+			}
+		}	
+		return false;
+	}
+	/**
 	 * Render the form with the given template
 	 *
 	 * @return string
@@ -312,16 +327,9 @@ class Formation_Core extends Validation{
 		}
 		
 		$form=new View($this->template);
-		$form_type = 'open';
-			
-		// See if we need a multipart form
-		foreach ($this as $input)
-		{
-			if ($input instanceof Element_Upload)
-			{
-				$form_type = 'open_multipart';
-			}
-		}
+		
+		$form_type= $this->is_multipart() ? 'open_multipart' : 'open';
+
 		//Form open and close
 		$form->open  = form::$form_type(arr::remove('action', $this->attr), $this->attr);
 		$form->close = form::close();
