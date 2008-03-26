@@ -12,6 +12,10 @@ class Model_Formation_Core extends Formation{
 	
 	protected $disabled=array();
 	
+	public static function factory($model=false,$exlude=array(),$form_fields=array(),$disabled=array())
+	{
+		return new self($model);
+	}
 	public function __construct($model=false)
 	{
 		parent::__construct();
@@ -35,6 +39,39 @@ class Model_Formation_Core extends Formation{
 		$this->build_form();
 	}
 	/**
+	 * Set form fields
+	 *
+	 * @param array $form_fields
+	 * @return unknown
+	 */
+	public function set_form_fields(array $form_fields)
+	{
+		$this->form_fields=$form_fields;
+		return $this;
+	}
+	/**
+	 * Set form fields
+	 *
+	 * @param array $form_fields
+	 * @return unknown
+	 */
+	public function set_exclude(array $form_fields)
+	{
+		$this->exclude=$form_fields;
+		return $this;
+	}
+	/**
+	 * Set form fields
+	 *
+	 * @param array $form_fields
+	 * @return unknown
+	 */
+	public function set_disabled(array $form_fields)
+	{
+		$this->exclude=$form_fields;
+		return $this;
+	}	
+	/**
 	 * Build form
 	 *
 	 * @param boolean $guess_fields, automatic field determination
@@ -54,7 +91,6 @@ class Model_Formation_Core extends Formation{
 			
 			//By default all fields are input
 			$type='input';
-
 
 			if(isset($validate[$name]['type']))
 			{

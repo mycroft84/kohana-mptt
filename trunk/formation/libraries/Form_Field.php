@@ -1,6 +1,6 @@
 <?php
 
-class Field_Core {
+class Form_Field_Core {
 
 	//Field name
 	protected $name;
