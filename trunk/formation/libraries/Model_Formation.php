@@ -12,11 +12,11 @@ class Model_Formation_Core extends Formation{
 	
 	protected $disabled=array();
 	
-	public static function factory($model=false,$exlude=array(),$form_fields=array(),$disabled=array())
+	public static function factory($model=false,$build=false)
 	{
-		return new self($model);
+		return new self($model,$build);
 	}
-	public function __construct($model=false)
+	public function __construct($model=false,$build=true)
 	{
 		parent::__construct();
 		
@@ -29,14 +29,14 @@ class Model_Formation_Core extends Formation{
 		}
 		elseif(!is_object($model))
 		{
-			$this->_model= new $this->_model($model);
+			$this->_model= new $model;
 		}
 		else
 		{
 			$this->_model=$model;				
 		}
-	
-		$this->build_form();
+		
+		$build and $this->build_form();
 	}
 	/**
 	 * Set form fields
@@ -76,11 +76,11 @@ class Model_Formation_Core extends Formation{
 	 *
 	 * @param boolean $guess_fields, automatic field determination
 	 */
-	protected function build_form()
+	public function build_form()
 	{
 		//Get field types and rules, filters everything
 		$validate=$this->_model->get_validate();
-				
+		$relationships=$this->_model->get_relationships();
 		foreach($this->_model->list_fields() as $name=>$property)
 		{
 			if(in_array($name,$this->exclude))
@@ -91,10 +91,10 @@ class Model_Formation_Core extends Formation{
 			
 			//By default all fields are input
 			$type='input';
-
 			if(isset($validate[$name]['type']))
 			{
-				$this->add_element($validate[$name]['type'],$name);
+				$type=$validate[$name]['type'];
+
 			}
 			else
 			{
@@ -107,10 +107,33 @@ class Model_Formation_Core extends Formation{
 				{
 					$type='input';
 				}
-	
-				//Adding elements
-				$this->add_element($type,$name);				
+				
+				if(substr($name,0,3)=='is_')
+				{
+					$type='checkbox';
+				}
+				$foreign_name=substr($name,0,-3);
+				
+				if(!empty($relationships['belongs_to'])&&in_array($foreign_name,$relationships['belongs_to']))
+				{
+					$array=(ORM::factory($foreign_name)->find_all());
+					$options=array();
+					foreach($array as $record){
+						$options[$record->id]=$record->name;
+					}
+					$type='dropdown';
+				}		
+			
 			}
+			//Adding elements
+			$this->add_element($type,$name);
+			
+			if(isset($options)&&!empty($options))
+			{
+				$this[$name]->set_options($options);
+
+			}
+			$options=array();
 
 			if(in_array($name,$this->disabled))
 			{
@@ -166,6 +189,7 @@ class Model_Formation_Core extends Formation{
 		}
 
 		$this->add_element('submit','Submit');
+		return $this;
 	}
 	/**
 	 * Retrieve model, might be handy sometime
@@ -186,6 +210,7 @@ class Model_Formation_Core extends Formation{
 		
 		if($this->validate())
 		{
+			
 			$this->_model->load_values($this->as_array());
 			if($commit==true)
 			{

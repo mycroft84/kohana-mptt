@@ -95,7 +95,12 @@ class Validation_Core extends ArrayObject{
 		}
 		return parent::offsetGet($key);
 	}
-	
+	/**
+	 * offsetset
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
 	public function offsetSet($key,$value)
 	{
 		if(!($value instanceof Element_Input) && !($value instanceof Element_Group))
@@ -381,7 +386,6 @@ class Validation_Core extends ArrayObject{
 		//Iterate over all fields and collect errors and error messages
 		foreach($this as $key=>$field)
 		{
-			
 			//Will validate fields and the Element_Group and load its values as well
 			$is_valid=$field->validate();
 			

@@ -2,7 +2,7 @@
 class Element_Group_Core extends Formation {
 	
 	protected $name;
-	
+	protected $_order;
 
 	public function __construct($name)
 	{
@@ -43,6 +43,15 @@ class Element_Group_Core extends Formation {
 	public function get_attr()
 	{
 		return false;
+	}
+	public function get_order()
+	{
+		return $this->_order;
+	}
+	public function set_order($value)
+	{
+		$this->_order=(int) $value;
+		return $this;
 	}
 }
 ?>

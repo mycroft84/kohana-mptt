@@ -9,7 +9,7 @@ class Element_Input_Core extends Form_Field {
 	);
 	
 	protected $label;
-
+	protected $order;
 	// Message output format
 	protected $message_format = '{message}';
 
@@ -73,6 +73,7 @@ class Element_Input_Core extends Form_Field {
 		
 		return $this;
 	}
+
 	/**
 	 * Get a form attribute
 	 *
@@ -150,5 +151,14 @@ class Element_Input_Core extends Form_Field {
 		$data['name']=$this->name;
 		
 		return form::input($data);
+	}
+	public function get_order()
+	{
+		return $this->order;
+	}
+	public function set_order($value)
+	{
+		$this->order=(int) $value;
+		return $this;
 	}
 }
