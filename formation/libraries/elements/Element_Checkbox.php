@@ -11,7 +11,7 @@ class Element_Checkbox_Core extends Element_Input {
 
 	public function load_value($value)
 	{
-		if(is_string($value))
+		if(!is_null($value))
 		{
 			$this->attr['checked'] = true;
 		}
@@ -20,7 +20,15 @@ class Element_Checkbox_Core extends Element_Input {
 			$this->set_value('');
 		}
 	}
-
+	public function set_value($value)
+	{
+		$this->value=(bool) $value;
+		$this->attr['checked'] = (bool) $value;
+		return $this;
+	}
+	public function get_value(){
+		return ($this->attr['checked'] == true);
+	}
 	protected function html_element()
 	{
 

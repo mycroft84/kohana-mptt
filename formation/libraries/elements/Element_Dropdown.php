@@ -29,7 +29,10 @@ class Element_Dropdown_Core extends Element_Input {
 	}
 	public function get_value()
 	{
-		return $this->get_selected;
+		return $this->get_selected();
+	}
+	public function __toString(){
+		return $this->get_value();
 	}
 	/**
 	 * Magically gets a variable.
@@ -43,7 +46,7 @@ class Element_Dropdown_Core extends Element_Input {
 	{
 		// Import base data
 		$data = $this->attr;
-
+		$data['name']=$this->name;
 		// Get the options and default selection
 		$options = $this->options;
 		$selected =$this->selected;
@@ -51,7 +54,7 @@ class Element_Dropdown_Core extends Element_Input {
 		return form::dropdown($data, $options, $selected);
 	}
 
-	protected function set_value($value)
+	public function set_value($value)
 	{
 		if (is_bool($this->is_valid))
 			return;

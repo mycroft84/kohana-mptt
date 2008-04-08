@@ -15,6 +15,9 @@ class Formation_Core extends Validation{
 	//Key/value pairs passed onto the template
 	protected $template_vars=array();
 
+	protected $order=array();
+	
+	protected $order_updated=true;
 	/**
 	 * Constructor
 	 *
@@ -39,7 +42,7 @@ class Formation_Core extends Validation{
 	 */
 	public function __set($key,$value)
 	{
-		$this->template_vars[$key]=$value;
+		$this->set_template_var($key,$value);
 	}
 	/**
 	 * Get template variables
@@ -54,7 +57,11 @@ class Formation_Core extends Validation{
 		
 		return false;
 	}
-
+	public function set_template_var($key,$value)
+	{
+		$this->template_vars[$key]=$value;
+		return $this;
+	}
 	/**
 	 * Validate the form
 	 *
@@ -124,6 +131,9 @@ class Formation_Core extends Validation{
 	 */
 	public function add_element($type,$name=null)
 	{
+		
+		$this->order_updated=true;
+
 		if($type instanceof Form_Field && $name==null)
 		{
 			$name=$type->get_name();
@@ -147,6 +157,10 @@ class Formation_Core extends Validation{
 			$type='Element_'.ucfirst(strtolower($type));
 			$this[$name]=new $type($name,$args);	
 		}
+		
+		$this[$name]->set_order(10+count($this)*10);
+		$this->order[$name]=$this[$name]->get_order();
+		
 		return $this[$name];
 	}
 	/**
@@ -159,6 +173,7 @@ class Formation_Core extends Validation{
 		if(isset($this[$element_name]))
 		{
 			unset($this[$element_name]);
+			$this->order_updated=true;
 			return $this;
 		}
 		return false;
@@ -182,6 +197,7 @@ class Formation_Core extends Validation{
 	 */
 	public function clear_elements()
 	{
+		$this->order_updated=true;
 		foreach($this as $element_name=>$object)
 		{
 			if($object instanceof Element_Input)
@@ -204,8 +220,13 @@ class Formation_Core extends Validation{
 	 */
 	public function add_group($group_element=null,$name)
 	{
+		$this->order_updated=true;
 		$this[$name]=new Element_Group($name);
+
 		
+		$this[$name]->set_order(10+count($this)*10);
+		$this->order[$name]=$this[$name]->get_order();
+				
 		if(is_string($group_element))
 		{
 			$group_element=array($group_element);
@@ -231,6 +252,8 @@ class Formation_Core extends Validation{
 				}
 			}	
 		}
+		
+		return $this[$name];
 	}
 	/**
 	 * Remove group and its elements from form
@@ -240,6 +263,7 @@ class Formation_Core extends Validation{
 	 */
 	public function remove_group($group_name)
 	{
+		$this->order_updated=true;
 		if(isset($this[$group_name]))
 		{
 			unset($this[$group_name]);
@@ -265,6 +289,7 @@ class Formation_Core extends Validation{
 	 */
 	public function clear_groups()
 	{
+		$this->order_updated=true;
 		foreach($this as $group_name=>$object)
 		{
 			if($object instanceof Element_Group)
@@ -337,13 +362,23 @@ class Formation_Core extends Validation{
 		//Errors and messages passed on to the form, not used in formation_template.php
 		$form->errors= $this->errors();
 		
+		$this->update_order();
 		// Set the inputs
-		$form->inputs = $this;
+		$form->inputs = $this->ordered_elements();
 		
 		//Set any template vars set using __set()
 		$form->set($this->template_vars);
 		
 		return $form;	
+	}
+	protected function ordered_elements()
+	{
+		$inputs=array();
+		foreach($this->order as $order =>$value)
+		{
+			$inputs[$order]=$this[$order];
+		}
+		return $inputs;
 	}
 	/**
 	 * Returns the form HTML
@@ -435,6 +470,10 @@ class Formation_Core extends Validation{
 	 */
 	public function set_values(array $data)
 	{
+		return $this->populate_form($data);
+	}	
+	public function populate_form(array $data)
+	{
 		foreach($data as $key=>$value)
 		{			
 			if(isset($this[$key]))
@@ -442,8 +481,94 @@ class Formation_Core extends Validation{
 				$this[$key]->set_value($value);
 			}
 		}
+		return $this;		
+		
+	}
+	public function update_order()
+	{
+		foreach($this as $name=>$field)
+		{
+			$this->order[$name]=$this[$name]->get_order();
+		}
+		$this->sort();
+		$this->order_updated=true;
 		return $this;
-	}	
-	
+	}
+	/**
+     * Sort items according to their order
+     * 
+     * @return void
+     */
+    public function sort()
+    {
+    	if($this->order_updated==true)
+    	{
+    		asort($this->order);
+    	}
+    	
+		$this->order_updated=false;
+    }	
+    /**
+     * Current element
+     * 
+     * @return
+     */
+    public function current()
+    {
+        $this->sort();
+        current($this->order);
+        $key = key($this->order);
+		
+        if(isset($this[$key]))
+        	return $this[$key];
+    }
+    /**
+     * Current element group name
+     * 
+     * @return string
+     */
+    public function key()
+    {
+        $this->sort();
+        return key($this->order);
+    }
+    /**
+     * Move pointer to next element group
+     * 
+     * @return void
+     */
+    public function next()
+    {
+        $this->sort();
+        next($this->order);
+    }
+    /**
+     * Move pointer to beginning of element group loop
+     * 
+     * @return void
+     */
+    public function rewind()
+    {
+        $this->_sort();
+        reset($this->order);
+    }
+    /**
+     * Determine if current element group is valid
+     * 
+     * @return bool
+     */
+    public function valid()
+    {
+        $this->sort();
+        return (current($this->order) !== false);
+    }
+    /**
+     * Count of elements that are iterable
+     * 
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->order);
+    }    
 }
-?>

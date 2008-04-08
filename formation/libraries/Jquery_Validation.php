@@ -66,10 +66,11 @@ class Jquery_Validation_Core extends ArrayObject {
 							break;														
 					}
 				}
-				$jquery['rules'][$input->name]=$rules;
-				$jquery['messages'][$input->name]=$messages;		
-
-				
+				if($rules!=array()&&$messages!=array())
+				{
+					$jquery['rules'][$input->name]=$rules;
+					$jquery['messages'][$input->name]=$messages;		
+				}
 				
 				$this->set_spl($jquery);
 				
