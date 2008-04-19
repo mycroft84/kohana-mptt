@@ -6,23 +6,30 @@ class Dispatch_Core{
 	
 	public static function controller($controller)
 	{
+		$controller_file=strtolower($controller);
 		
-		// If the file doesn't exist, just return
-		if (($filepath = Kohana::find_file('controllers', $controller)) === FALSE)
-			return FALSE;
-			
-		// Include the Controller file
-		require $filepath;
-
 		// Set controller class name
 		$controller = ucfirst($controller).'_Controller';
-
-		// Make sure the controller class exists
-		class_exists($controller, FALSE) or Event::run('system.404');
-
-
+		
+		if(!class_exists($controller, FALSE))
+		{
+			// If the file doesn't exist, just return
+			if (($filepath = Kohana::find_file('controllers', $controller_file)) === FALSE)
+				return FALSE;
+				
+			// Include the Controller file
+			require_once $filepath;
+		}
+		
+		// Run system.pre_controller
+		Event::run('dispatch.pre_controller');
+		
 		// Initialize the controller
 		$controller = new $controller;
+
+		// Run system.post_controller_constructor
+		Event::run('dispatch.post_controller_constructor');		
+					
 		return new Dispatch($controller);
 	}
 	public function __construct(Controller $controller)
@@ -43,12 +50,25 @@ class Dispatch_Core{
 		if(!method_exists($this->controller,$method))
 			return false;
 			
+		if (method_exists($this->controller,'_remap'))
+		{
+			// Make the arguments routed
+			$arguments = array($method, $arguments);
+
+			// The method becomes part of the arguments
+			array_unshift($arguments, $method);
+
+			// Set the method to _remap
+			$method = '_remap';
+		}	
+				
 		ob_start();
 		
 		if(is_string($arguments))
 		{
 			$arguments=array($arguments);
 		}
+			
 		switch(count($arguments))
 		{
 			case 1:
@@ -69,7 +89,9 @@ class Dispatch_Core{
 			break;
 		}		
 		
-		
+		// Run system.post_controller
+		Event::run('dispatch.post_controller');
+					
 		$buffer=ob_get_contents();
 		
 		ob_end_clean();
