@@ -37,6 +37,29 @@ class Dispatch_Core{
 		$this->controller=$controller;
 		
 	}
+	public function __get($key)
+	{
+		if($key=='controller')
+		{
+			return $this->$key;
+		}
+		else
+		{
+			return $this->controller->$key;
+		}
+	}
+	public function __set($key,$value)
+	{
+		$this->controller->$key=$value;
+	}
+	public function __toString()
+	{
+		return $this->render();
+	}
+	public function render()
+	{
+		return (string) $this->controller;
+	}
 	public function __call($name,$arguments=null)
 	{
 		if(method_exists($this->controller,$name))
@@ -72,31 +95,34 @@ class Dispatch_Core{
 		switch(count($arguments))
 		{
 			case 1:
-				$this->controller->$method($arguments[0]);
+				$result=$this->controller->$method($arguments[0]);
 			break;
 			case 2:
-				$this->controller->$method($arguments[0], $arguments[1]);
+				$result=$this->controller->$method($arguments[0], $arguments[1]);
 			break;
 			case 3:
-				$this->controller->$method($arguments[0], $arguments[1], $arguments[2]);
+				$result=$this->controller->$method($arguments[0], $arguments[1], $arguments[2]);
 			break;
 			case 4:
-				$this->controller->$method($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
+				$result=$this->controller->$method($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
 			break;
 			default:
 				// Resort to using call_user_func_array for many segments
-				call_user_func_array(array($this->controller, $method), $arguments);
+				$result=call_user_func_array(array($this->controller, $method), $arguments);
 			break;
 		}		
-		
+	
 		// Run system.post_controller
 		Event::run('dispatch.post_controller');
-					
-		$buffer=ob_get_contents();
-		
-		ob_end_clean();
-		
-		return $buffer;
+
+		if($result!=NULL)
+		{
+			$result=ob_get_contents();
+			
+			ob_end_clean();		
+		}
+
+		return $result;
 	}
 	
 }
