@@ -301,13 +301,15 @@ class Form_Field_Core {
 	 */
 	public function add_rule($rule,$arguments=null,$name=null)
 	{
-		//$rule must be child of Rule but not Rule itself
-		if(!($rule instanceof Rule) || get_class($rule)=='Rule')
+		if(!($rule instanceof Rule))
 		{
-			if(!($rule=new $rule($arguments)))
-				throw new Kohana_Exception('formation.invalid_input', get_class($type));
-			
+			if(substr($rule,0,5)!='Rule_')
+			{
+				$rule='Rule_'.ucfirst($rule);
+			}
+			$rule=new $rule($arguments);
 		}
+
 		//Custom names for fields
 		$name=($name==null)? get_class($rule) : $name;
 		
