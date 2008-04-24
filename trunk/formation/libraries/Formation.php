@@ -227,31 +227,23 @@ class Formation_Core extends Validation{
 		$this[$name]->set_order(10+count($this)*10);
 		$this->order[$name]=$this[$name]->get_order();
 				
-		if(is_string($group_element))
+		foreach((array) $group_element as $element)
 		{
-			$group_element=array($group_element);
-		}
-		
-		if(is_array($group_element))
-		{
-			foreach($group_element as $element)
+			if(isset($this[$element]))
 			{
-				if(isset($this[$element]))
-				{
-					$element=$this[$element];
-				}
-								
-				if($element instanceof Element_Input)
-				{
-					$this[$name]->add_element($element);
-					$this->remove_element($element->name);						
-				}
-				else
-				{
-					throw new Kohana_Exception('formation.invalid_input', get_class($element));
-				}
-			}	
-		}
+				$element=$this[$element];
+			}
+							
+			if($element instanceof Element_Input)
+			{
+				$this[$name]->add_element($element);
+				$this->remove_element($element->name);						
+			}
+			else
+			{
+				throw new Kohana_Exception('formation.invalid_input', get_class($element));
+			}
+		}	
 		
 		return $this[$name];
 	}
@@ -464,6 +456,7 @@ class Formation_Core extends Validation{
 	}
 	/**
 	 * set values of the form e.g. form db
+	 * deprecated: use populate_form
 	 *
 	 * @param array $data
 	 * @return object
@@ -472,6 +465,12 @@ class Formation_Core extends Validation{
 	{
 		return $this->populate_form($data);
 	}	
+	/**
+	 * set values of the form e.g. form db
+	 *
+	 * @param array $data
+	 * @return object
+	 */	
 	public function populate_form(array $data)
 	{
 		foreach($data as $key=>$value)

@@ -407,34 +407,28 @@ class Validation_Core extends ArrayObject{
 	}
 	public function validate_partial($partial)
 	{
-		if(is_string($partial))
+		foreach((array) $partial as $field)
 		{
-			$partial=array($partial);
-		}
-		if(is_array($partial))
-		{
-			foreach($partial as $field)
-			{
-		
-				if(isset($this[$field]))
-				{	
-					//Will validate the Element_Group and load its values as well
-					$this[$field]->validate();
-					
-					if($this[$field] instanceof Element_Group)
-					{
-						$this->errors=array_merge($this[$field]->errors(),$this->errors);
-					}
-					else
-					{	
-						if($this[$field]->errors()!= null)
-						{
-							$this->errors[$this[$field]->name]=$this[$field]->errors();
-						}
-					}	
+	
+			if(isset($this[$field]))
+			{	
+				//Will validate the Element_Group and load its values as well
+				$this[$field]->validate();
+				
+				if($this[$field] instanceof Element_Group)
+				{
+					$this->errors=array_merge($this[$field]->errors(),$this->errors);
 				}
+				else
+				{	
+					if($this[$field]->errors()!= null)
+					{
+						$this->errors[$this[$field]->name]=$this[$field]->errors();
+					}
+				}	
 			}
 		}
+		
 		return (count($this->errors) === 0);
 	}
 	/**
