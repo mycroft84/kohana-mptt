@@ -4,8 +4,6 @@ class Dispatch_Core{
 	
 	protected $controller;
 	
-	public static function controller($controller)
-	{
 	public static function controller($rsegments)
 	{
 		$rsegments = explode('/', $rsegments);
