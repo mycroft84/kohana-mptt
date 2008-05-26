@@ -6,6 +6,56 @@ class Dispatch_Core{
 	
 	public static function controller($controller)
 	{
+	public static function controller($rsegments)
+	{
+		$rsegments = explode('/', $rsegments);
+		// Prepare for Controller search
+		$directory  = '';
+		$controller = '';
+		
+		// Optimize the check for the most common controller location
+		if (is_file(APPPATH.'controllers/'.$rsegments[0].EXT))
+		{
+			$controller = $rsegments[0];
+		}
+		else
+		{
+			// Fetch the include paths
+			$include_paths = Config::include_paths();
+
+			// Path to be added to as we search deeper
+			$search = 'controllers';
+			
+			// controller path to be added to as we search deeper
+			$controller_path = '';
+			
+			// Use the rsegments to find the controller
+			foreach ($rsegments as $key => $segment)
+			{
+				foreach ($include_paths as $path)
+				{
+					// The controller has been found, all arguments can be set
+					if (is_file($path.$search.'/'.$segment.EXT))
+					{
+						$directory       = $path.$search.'/';
+						$controller_path = $controller_path;
+						$controller      = $segment;
+						// Stop searching, two levels
+						break 2;
+					}
+				}
+
+				// Add the segment to the search
+				$search .= '/'.$segment;
+				$controller_path .= $segment.'/';
+			}
+		}
+		if ( $filepath = Kohana::find_file($search, $segment) )
+		{
+			// Include the Controller file
+			require_once $filepath;
+		}		
+		
 		$controller_file=strtolower($controller);
 		
 		// Set controller class name
