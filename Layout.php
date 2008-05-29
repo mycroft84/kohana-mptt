@@ -1,7 +1,7 @@
 <?php
 class Layout_Core {
 
-	private static $instance;
+	protected static $instance;
 		
 	protected $layout='layouts/layout';
 	
@@ -125,3 +125,4 @@ class Layout_Core {
 		}
 	}
 }
+
