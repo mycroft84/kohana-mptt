@@ -5,15 +5,15 @@ class Layout_Core {
 		
 	protected $layout='layouts/layout';
 	
-	protected $view;
+	protected $layout_view;
 	
-	protected $render_layout=true;
+	protected $render_layout=TRUE;
 	/**
 	 * Singleton instance
 	 * @return object singleton instance
 	 * @param $layout Object[optional]
 	 */
-	public static function instance($layout=false)
+	public static function instance($layout=FALSE)
 	{
         if(is_null(self::$instance))
         {
@@ -32,7 +32,7 @@ class Layout_Core {
 		
 		Event::add('system.post_controller',array($this,'render'));
 		
-		$this->view=new View;
+		$this->layout_view=new View;
 		Kohana::$instance->view=new View;
 		
 	}
@@ -52,9 +52,9 @@ class Layout_Core {
 		
 		if($this->render_layout==true)
 		{	
-			$this->view->set_filename($this->layout);
-			$this->view->content=Kohana::$instance->view;
-			$this->view->render(true);
+			$this->layout_view->set_filename($this->layout);
+			$this->layout_view->content=Kohana::$instance->view;
+			$this->layout_view->render(true);
 		}
 		else
 		{			
@@ -86,7 +86,7 @@ class Layout_Core {
 	/**
 	 * Magic __get method
 	 * @return mixed
-	 * @param $name Object
+	 * @param $name 
 	 */
 	public function __get($name)
 	{
@@ -100,14 +100,14 @@ class Layout_Core {
 		}		
 		else
 		{
-			return $this->view->$name;
+			return $this->layout_view->$name;
 		}
 	}
 	/**
 	 * Magic __set method
 	 * @return 
-	 * @param $name Object
-	 * @param $value Object
+	 * @param $name 
+	 * @param $value 
 	 */
 	public function __set($name,$value)
 	{
@@ -121,8 +121,22 @@ class Layout_Core {
 		}
 		else
 		{
-			$this->view->$name=$value;
+			$this->layout_view->$name=$value;
 		}
+	}
+	/**
+	 * Disable layout
+	 */
+	public function disable_layout()
+	{
+		$this->render_layout=false;
+	}
+	/**
+	 * Enable layout
+	 */
+	public function enable_layout()
+	{
+		$this->render_layout=true;
 	}
 }
 
