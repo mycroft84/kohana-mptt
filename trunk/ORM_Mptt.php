@@ -99,6 +99,16 @@ class ORM_Mptt_Core{
 		
 		return $this;
 	}  
+
+	/**
+	* Test to see if node has children
+	* 
+	* @return boolean
+	*/
+	function has_descendants()
+	{ 
+		return (($this->model->{$this->right_column} - $this->model->{$this->left_column}) > 1);
+	}		
 	protected function modify_node($node_int, $changeVal)
 	{
 		$leftcol        =       $this->left_column;
