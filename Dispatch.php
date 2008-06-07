@@ -6,11 +6,17 @@ class Dispatch_Core{
 	
 	public static function controller($rsegments)
 	{
+	
+		//TODO fix the mess
+		//TODO add caching parameter
+	
 		$rsegments = explode('/', $rsegments);
 		// Prepare for Controller search
 		$directory  = '';
 		$controller = '';
-		
+		// Path to be added to as we search deeper
+		$search = 'controllers';
+					
 		// Optimize the check for the most common controller location
 		if (is_file(APPPATH.'controllers/'.$rsegments[0].EXT))
 		{
@@ -21,8 +27,8 @@ class Dispatch_Core{
 			// Fetch the include paths
 			$include_paths = Config::include_paths();
 
-			// Path to be added to as we search deeper
-			$search = 'controllers';
+			
+
 			
 			// controller path to be added to as we search deeper
 			$controller_path = '';
