@@ -5,6 +5,8 @@ class Module_Core{
 	//Array of registered modules
 	protected static $modules=array();
 	
+	public static $loaded_module;
+	
 	//Module name
 	public $module_name;
 	
@@ -19,9 +21,26 @@ class Module_Core{
 	{
 		if(Router::$controller==null AND self::is_registered(Router::$rsegments[0]))
 		{
-			$module=self::get(Router::$rsegments[0]);
-			$module->route();	
+			self::$loaded_module=self::get(Router::$rsegments[0]);
+			self::$loaded_module->route();	
 		}		
+		
+		Event::run('module.post_loading');
+			
+		$paths=array();
+		if(self::$load_registered_modules==true)
+		{
+			foreach(self::$modules as $module)
+			{
+				$paths[]=$module->module_path;
+			}
+		}
+		else
+		{
+			$paths[]=self::$loaded_module->module_path;
+		}
+		//Load triggered (or all) module into include paths so views, models and libraries can be loaded the normal way.
+		Config::set('core.modules',array_merge(Config::item('core.modules'),$paths));			
 	}
 	//Register new modules
 	public static function register($name,$path)
@@ -67,23 +86,8 @@ class Module_Core{
 		Router::$method     = isset(Router::$rsegments[2]) ? Router::$rsegments[2] : 'index';
 		Router::$arguments  = isset(Router::$rsegments[3]) ? array_slice(Router::$rsegments, 3) : array();	
         
+		pr(Router::$controller);
 		Event::run('module.post_routing');
-		
-		$paths=array();
-		if(self::$load_registered_modules==true)
-		{
-			foreach(self::$modules as $module)
-			{
-				$paths[]=$module->module_path;
-			}
-		}
-		else
-		{
-			$paths[]=$this->module_path;
-		}
-		//Load triggered (or all) module into include paths so views, models and libraries can be loaded the normal way.
-		Config::set('core.modules',array_merge(Config::item('core.modules'),$paths));	
-
 	}
 	public function find_file($directory, $filename, $required = FALSE, $ext = FALSE, $use_cache = TRUE)
 	{
