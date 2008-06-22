@@ -756,7 +756,7 @@ class MPTT extends ORM {
 	*/
 	function has_parent()
 	{ 
-		return $this->is_valid_node(get_parent());
+		return $this->is_valid_node($this->get_parent());
 	}
 	
 	/**
@@ -766,7 +766,7 @@ class MPTT extends ORM {
 	*/
 	function has_prev_sibling()
 	{ 
-		return $this->is_valid_node(get_prev_sibling());
+		return $this->is_valid_node($this->get_prev_sibling());
 	}
 	
 	/**
@@ -776,7 +776,7 @@ class MPTT extends ORM {
 	*/
 	function has_next_sibling()
 	{ 
-		return $this->is_valid_node(get_next_sibling());
+		return $this->is_valid_node($this->get_next_sibling());
 	}
 	
 	/**
