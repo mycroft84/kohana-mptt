@@ -1,4 +1,11 @@
 <?php
+/**
+ * Khaos :: Khacl
+ * 
+ * @author      David Cole <neophyte@sourcetutor.com>
+ * @author      dlib  <dlib@hichte.nl>
+ */
+
 class Acl{
 	
 	protected $db;
