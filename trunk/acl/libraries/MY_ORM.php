@@ -41,39 +41,7 @@ class ORM extends ORM_Core{
 		}
 		return parent::__call($method,$args);
 	}	
-	/**
-	 * Loads the database if it is not already loaded. Used during initialization
-	 * and unserialization.
-	 *
-	 * @return  void
-	 */
-	protected function connect()
-	{
-		if (self::$db === NULL)
-		{
-			// Load database, if not already loaded
-			(Registry::get('db')==false) and self::$db = Database::instance();
-			
-			Registry::set('db',self::$db);
-		}
 
-		if (empty(self::$fields[$this->table]))
-		{
-			if ($fields = self::$db->list_fields($this->table))
-			{
-				foreach ($fields as $field => $data)
-				{
-					// Cache the column names
-					self::$fields[$this->table][$field] = $data;
-				}
-			}
-			else
-			{
-				// Table doesn't exist
-				throw new Kohana_Exception('database.table_not_found', $this->table);
-			}
-		}
-	}	
 	/**
 	 * Load array of values into ORM object
 	 *
