@@ -5,6 +5,10 @@ class SpamCheck_Core{
 	protected $checks=array();
 	
 	protected $weights=array();
+	
+	protected $scores=array();
+	
+	protected $weighted_scores=array();
 	/**
 	 * Set add field and value
 	 * 
@@ -89,12 +93,12 @@ class SpamCheck_Core{
 		
 		foreach($this->checks as $check_name=>$check)
 		{
-			$scores[$check_name]			=	$this->calculate_score($check->check());
+			$this->scores[$check_name]			=	$this->calculate_score($check->check());
 			
-			$weighted_scores[$check_name]	=	$scores[$check_name]*$this->weights[$check_name];
+			$this->weighted_scores[$check_name]	=	$this->scores[$check_name]*$this->weights[$check_name];
 		}
 		//Sum of weighted scores		
-		$weighted_sum=array_sum($weighted_scores);
+		$weighted_sum=array_sum($this->weighted_scores);
 		//Number of checks
 		$num_checks=count($this->checks);
 		//Average score
@@ -102,7 +106,7 @@ class SpamCheck_Core{
 		//Max score
 		$avg_score= $avg_score > 100 ? 100 : $avg_score;
 		//Min score
-		$avg_score= $avg_score < 0 ? 0 : $avg_score;
+		$avg_score= $avg_score < -100 ? -100 : $avg_score;
 		
 		return $avg_score;
 	}
@@ -116,7 +120,7 @@ class SpamCheck_Core{
 	{
 		if(is_bool($result))
 		{
-			return $result==true ? 100 : 0; 
+			return $result==true ? 100 : -100; 
 		}
 		return (int) $result;
 	}
