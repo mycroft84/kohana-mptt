@@ -126,13 +126,14 @@ class SpamCheck_Core{
 	}
 	/**
 	 * Get weighted scores after check
-	 * 
+	 * @return array weighted scores
 	 */
 	public function get_weighted_scores(){
 		return $this->weighted_scores;
 	}
 	/**
 	 * Like check() only returns boolean (score below zero is spam, above not)
+	 * @return boolean
 	 */
 	public function is_spam()
 	{
