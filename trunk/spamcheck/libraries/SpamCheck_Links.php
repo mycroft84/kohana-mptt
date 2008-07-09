@@ -5,6 +5,8 @@ class SpamCheck_Links extends SpamCheck_Abstract{
 	
 	protected $power=2;
 	
+	protected $field='content';
+	
 	public function set_max_links($count)
 	{
 		$this->max_links=$count;
@@ -15,11 +17,17 @@ class SpamCheck_Links extends SpamCheck_Abstract{
 		$this->power=$power;
 		return $this;
 	}
+	public function set_field($field)
+	{
+		$this->field=$field;
+		return $this;
+	}
+	
 	/*
 	 * Check the comment for being spam
 	 */
 	public function check(){
-		$content=strtolower($this->spamcheck->get_field('content'));
+		$content=strtolower($this->spamcheck->get_field($this->field));
 		
 		//Algorithm from Geert_DD		
 		$count = substr_count($content, 'http://');
