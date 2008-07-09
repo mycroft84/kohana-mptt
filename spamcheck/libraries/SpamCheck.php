@@ -135,9 +135,9 @@ class SpamCheck_Core{
 	 * Like check() only returns boolean (score below zero is spam, above not)
 	 * @return boolean
 	 */
-	public function is_spam()
+	public function is_spam($threshold=0)
 	{
-		if($this->check() < 0)
+		if($this->check() < $threshold)
 			return true;
 		return false;
 	}

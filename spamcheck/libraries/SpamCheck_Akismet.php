@@ -16,8 +16,11 @@ class SpamCheck_Akismet extends SpamCheck_Abstract{
 	{
 		if(method_exists($this->akismet,$method))
 		{
-			return call_user_func_array(array($this->akismet,$method),$args);
+			call_user_func_array(array($this->akismet,$method),$args);
+			return $this;
 		}
+		throw new Kohana_Exception('spamcheck.no_such_method');
+		
 	}
 	/*
 	 * Check the comment for being spam
@@ -65,17 +68,7 @@ class Akismet_Plus extends Akismet{
 		$this->comment['user_ip'] = $_SERVER['REMOTE_ADDR'] == getenv('SERVER_ADDR') ? $_SERVER['REMOTE_ADDR'] : getenv('HTTP_X_FORWARDED_FOR');
 		
 	}	
-	public function setBlogURL($blog_url)
-	{
-		$this->blogURL=$blog_url;
-		$this->comment['blog']=$blog_url;
-		return $this;
-	}
-	public function setAPIKey($wordPressAPIKey)
-	{
-		$this->wordPressAPIKey = $wordPressAPIKey;
-		return $this;
-	}
+
 }
 /**
  * Akismet anti-comment spam service
@@ -162,13 +155,14 @@ class Akismet
 							'QUERY_STRING',
 							'PHP_SELF' );
 	
-	/**
+		/**
 	 *	@param	string	$blogURL			The URL of your blog.
 	 *	@param	string	$wordPressAPIKey	WordPress API key.
 	 */
-	public function __construct($blogURL, $wordPressAPIKey) {
-		$this->blogURL = $blogURL;
-		$this->wordPressAPIKey = $wordPressAPIKey;
+	public function __construct($blogURL=null, $wordPressAPIKey=null) {
+
+		$this->setBlogURL($blogURL);
+		$this->setAPIKey($wordPressAPIKey);
 		
 		// Set some default values
 		$this->apiPort = 80;
@@ -176,7 +170,6 @@ class Akismet
 		$this->akismetVersion = '1.1';
 		
 		// Start to populate the comment data
-		$this->comment['blog'] = $blogURL;
 		$this->comment['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 		
 		if(isset($_SERVER['HTTP_REFERER'])) {
@@ -191,7 +184,8 @@ class Akismet
 		 * Otherwise the user_ip appears as the IP address of the PHP4 server passing the requests to the 
 		 * PHP5 one...
 		 */
-		$this->comment['user_ip'] = $_SERVER['REMOTE_ADDR'] != getenv('SERVER_ADDR') ? $_SERVER['REMOTE_ADDR'] : getenv('HTTP_X_FORWARDED_FOR');
+		$this->comment['user_ip'] = $_SERVER['REMOTE_ADDR'] == getenv('SERVER_ADDR') ? $_SERVER['REMOTE_ADDR'] : getenv('HTTP_X_FORWARDED_FOR');
+		
 	}
 	
 	/**
@@ -282,7 +276,27 @@ class Akismet
 	public function submitHam() {
 		$this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.' . $this->akismetServer, '/' . $this->akismetVersion . '/submit-ham');
 	}
-	
+	/**
+	 *	Set the blog url for the api and the comment
+	 *
+	 *	@param string $blogURL
+	 */	
+	public function setBlogURL($blogURL)
+	{
+		$this->blogURL=$blogURL;
+		$this->comment['blog']=$blogURL;
+		return $this;
+	}
+	/**
+	 *	Set API key for Akismet
+	 *
+	 *	@param string $wordPressAPIKey
+	 */	
+	public function setAPIKey($wordPressAPIKey)
+	{
+		$this->wordPressAPIKey = $wordPressAPIKey;
+		return $this;
+	}	
 	/**
 	 *	To override the user IP address when submitting spam/ham later on
 	 *
@@ -290,6 +304,7 @@ class Akismet
 	 */
 	public function setUserIP($userip) {
 		$this->comment['user_ip'] = $userip;
+		return $this;
 	}
 	
 	/**
@@ -299,6 +314,7 @@ class Akismet
 	 */
 	public function setReferrer($referrer) {
 		$this->comment['referrer'] = $referrer;
+		return $this;
 	}
 	
 	/**
@@ -308,6 +324,7 @@ class Akismet
 	 */
 	public function setPermalink($permalink) {
 		$this->comment['permalink'] = $permalink;
+		return $this;
 	}
 	
 	/**
@@ -317,6 +334,7 @@ class Akismet
 	 */
 	public function setCommentType($commentType) {
 		$this->comment['comment_type'] = $commentType;
+		return $this;
 	}
 	
 	/**
@@ -324,6 +342,7 @@ class Akismet
 	 */
 	public function setCommentAuthor($commentAuthor) {
 		$this->comment['comment_author'] = $commentAuthor;
+		return $this;
 	}
 	
 	/**
@@ -333,6 +352,7 @@ class Akismet
 	 */
 	public function setCommentAuthorEmail($authorEmail) {
 		$this->comment['comment_author_email'] = $authorEmail;
+		return $this;
 	}
 	
 	/**
@@ -340,6 +360,7 @@ class Akismet
 	 */	
 	public function setCommentAuthorURL($authorURL) {
 		$this->comment['comment_author_url'] = $authorURL;
+		return $this;
 	}
 	
 	/**
@@ -347,6 +368,7 @@ class Akismet
 	 */
 	public function setCommentContent($commentBody) {
 		$this->comment['comment_content'] = $commentBody;
+		return $this;
 	}
 	
 	/**
@@ -354,6 +376,7 @@ class Akismet
 	 */
 	public function setAPIPort($apiPort) {
 		$this->apiPort = $apiPort;
+		return $this;
 	}
 	
 	/**
@@ -361,6 +384,7 @@ class Akismet
 	 */
 	public function setAkismetServer($akismetServer) {
 		$this->akismetServer = $akismetServer;
+		return $this;
 	}
 	
 	/**
@@ -368,6 +392,7 @@ class Akismet
 	 */
 	public function setAkismetVersion($akismetVersion) {
 		$this->akismetVersion = $akismetVersion;
+		return $this;
 	}
 }
 
