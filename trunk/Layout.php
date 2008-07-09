@@ -5,15 +5,15 @@ class Layout_Core {
 		
 	protected $layout='layouts/layout';
 	
-	protected $layout_view;
+	protected $view;
 	
-	protected $render_layout=TRUE;
+	protected $render_layout=true;
 	/**
 	 * Singleton instance
 	 * @return object singleton instance
 	 * @param $layout Object[optional]
 	 */
-	public static function instance($layout=FALSE)
+	public static function instance($layout=false)
 	{
         if(is_null(self::$instance))
         {
@@ -32,7 +32,7 @@ class Layout_Core {
 		
 		Event::add('system.post_controller',array($this,'render'));
 		
-		$this->layout_view=new View;
+		$this->view=new View;
 		Kohana::$instance->view=new View;
 		
 	}
@@ -52,9 +52,9 @@ class Layout_Core {
 		
 		if($this->render_layout==true)
 		{	
-			$this->layout_view->set_filename($this->layout);
-			$this->layout_view->content=Kohana::$instance->view;
-			$this->layout_view->render(true);
+			$this->view->set_filename($this->layout);
+			$this->view->content=Kohana::$instance->view;
+			$this->view->render(true);
 		}
 		else
 		{			
@@ -72,7 +72,7 @@ class Layout_Core {
 	 */
 	public function view_path()
 	{
-		return (Router::$controller_path.Router::$controller.'/'.Router::$method);
+		return (Router::$controller_dir.'/'.Router::$controller.'/'.Router::$method);
 	}
 	/**
 	 * calls render()
@@ -86,7 +86,7 @@ class Layout_Core {
 	/**
 	 * Magic __get method
 	 * @return mixed
-	 * @param $name 
+	 * @param $name Object
 	 */
 	public function __get($name)
 	{
@@ -100,14 +100,14 @@ class Layout_Core {
 		}		
 		else
 		{
-			return $this->layout_view->$name;
+			return $this->view->$name;
 		}
 	}
 	/**
 	 * Magic __set method
 	 * @return 
-	 * @param $name 
-	 * @param $value 
+	 * @param $name Object
+	 * @param $value Object
 	 */
 	public function __set($name,$value)
 	{
@@ -121,22 +121,8 @@ class Layout_Core {
 		}
 		else
 		{
-			$this->layout_view->$name=$value;
+			$this->view->$name=$value;
 		}
-	}
-	/**
-	 * Disable layout
-	 */
-	public function disable_layout()
-	{
-		$this->render_layout=false;
-	}
-	/**
-	 * Enable layout
-	 */
-	public function enable_layout()
-	{
-		$this->render_layout=true;
 	}
 }
 
