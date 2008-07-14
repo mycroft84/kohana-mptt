@@ -116,7 +116,7 @@ class Model_Formation_Core extends Formation{
 				
 				if(!empty($relationships['belongs_to'])&&in_array($foreign_name,$relationships['belongs_to']))
 				{
-					$array=(ORM::factory($foreign_name)->find_all());
+					$array=(Ext_ORM::factory($foreign_name)->find_all());
 					$options=array();
 					foreach($array as $record){
 						$options[$record->id]=$record->name;
