@@ -11,6 +11,7 @@ class Sitemap_Core{
 	
 	public $location;
 	
+	protected $ttl;
 	/**
 	 * Constructs the Sitemap controller
 	 * 
@@ -18,24 +19,24 @@ class Sitemap_Core{
 	public function __construct()
 	{
 		//Create sitemap
-		$this->create_sitemap();
+		$this->create();
 		$this->location=url::base().'sitemap.xml';
 	}
 
 	/**
 	 * Render sitemap, sends xml header
 	 */
-	public function render($header = TRUE){
-		
+	public function render()
+	{
 		//XML header
-		$header AND header('Content-type: text/xml; charset=UTF-8');	
-		return $this->get_sitemap();
+		header('Content-type: text/xml; charset=UTF-8');	
+		return $this->get();
 	}
 	/**
 	 * Get the xml sitemap 
 	 * @return	string
 	 */
-	public function get_sitemap()
+	public function get()
 	{
 		return $this->sitemap->saveXML();
 	}
@@ -43,7 +44,7 @@ class Sitemap_Core{
 	 * Save sitemap to the location
 	 * @param	string	file location
 	 */
-	public function save_sitemap($location)
+	public function save($location)
 	{
 		$this->sitemap->save($location);
 	}
@@ -51,7 +52,8 @@ class Sitemap_Core{
 	 * Creates beginning of sitemap without urls
 	 * @return	void
 	 */
-	protected function create_sitemap(){
+	protected function create()
+	{
 		//Create sitemap
 		$sitemap= new DOMDocument;
 		$sitemap->formatOutput = true;
@@ -135,6 +137,7 @@ class Sitemap_Core{
 		foreach($model_names as $model_name)
 		{
 			$entries=ORM::factory($model_name);
+			
 			($where != NULL) and $entries->where($where);
 			 
 			$entries=$entries->find_all();
