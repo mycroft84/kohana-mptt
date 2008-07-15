@@ -11,7 +11,9 @@ class Sitemap_Core{
 	
 	public $location;
 	
-	protected $ttl;
+	public $cache_name='sitemap_cache';
+	
+	public $cache;
 	/**
 	 * Constructs the Sitemap controller
 	 * 
@@ -26,11 +28,45 @@ class Sitemap_Core{
 	/**
 	 * Render sitemap, sends xml header
 	 */
-	public function render()
+	public function render($cache = FALSE,$ttl=86400)
 	{
 		//XML header
-		header('Content-type: text/xml; charset=UTF-8');	
+		$this->send_header();
+		
+		$cache AND $this->cache($ttl);
+		
 		return $this->get();
+	}
+	/*
+	 * Cache current sitemap
+	 */
+	public function cache($ttl=86400)
+	{
+		Cache::instance()->set($this->cache_name,$this->get(), NULL, $ttl);
+		return $this;
+	}
+	/*
+	 * Render from cache or return false;
+	 */
+	public function cache_render(){
+
+		if(($sitemap_cache=Cache::instance()->get($this->cache_name)) != NULL)
+		{
+			$this->send_header();
+				echo $sitemap_cache;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	/*
+	 * Invalidate cache
+	 */
+	public function invalidate_cache()
+	{
+		Cache::instance()->delete($this->cache_name);
 	}
 	/**
 	 * Get the xml sitemap 
@@ -47,6 +83,13 @@ class Sitemap_Core{
 	public function save($location)
 	{
 		$this->sitemap->save($location);
+	}
+	/**
+	 * Send the xml header
+	 */
+	public function send_header()
+	{
+		header('Content-type: text/xml; charset=UTF-8');
 	}
 	/**
 	 * Creates beginning of sitemap without urls
