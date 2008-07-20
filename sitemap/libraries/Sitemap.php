@@ -129,11 +129,14 @@ class Sitemap_Core{
 	
 		if(!valid::url($location))
 			throw new Kohana_Exception('sitemap.url_wrong_type', $location);
+		
+		if($this->url_exists($location)==true)
+			return false;
 			
 		$url=$this->sitemap->createElement("url");
-		
 		$loc=$this->sitemap->createElement("loc",$location);
 		$url->appendChild($loc);
+		
 		
 		//Last modification is optional
 		if($lastmod != NULL)
@@ -196,6 +199,16 @@ class Sitemap_Core{
 		}		
 		return $this;
 	}	
+	/**
+	 * Test whether url already exists
+	 */
+	protected function url_exists($url){
+
+		$xpath=new DOMXPath($this->sitemap);
+		$query='/urlset/url[loc="'.$url.'"]';
+		
+		return ($xpath->query($query)->length > 0);
+	}
 	/*
 	 * Ping sitemaps provider
 	 * @param	array	
