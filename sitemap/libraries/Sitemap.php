@@ -216,9 +216,9 @@ class Sitemap_Core{
 	public function ping_google(array $options=array())
 	{
 		$url='www.google.com';
-		try
+
+		if($request=@fsockopen($url,80))
 		{
-			$request=fsockopen($url,80);
 			$http = 'GET /webmasters/sitemaps/ping?sitemap=' . 
 			urlencode($this->location).
 					 " HTTP/1.1\r\n".
@@ -229,13 +229,10 @@ class Sitemap_Core{
 			$response= fgets($request, 128);
 			fclose($request);
 
-			return (trim($response)=='HTTP/1.1 200 OK');
-
+			return (trim($response)=='HTTP/1.1 200 OK');		
 		}
-		catch (Exception $e)
-		{
-			return false;
-		}		
+		return false;
+
 	}
 
 }
