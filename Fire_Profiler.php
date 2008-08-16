@@ -92,6 +92,9 @@ class Fire_Profiler extends FirePHP{
 	 */	
 	public function session()
 	{
+	
+		if (empty($_SESSION)) return;
+			
 		$table = array();
 		$table[] = array('Session','Value');
 		
@@ -133,6 +136,8 @@ class Fire_Profiler extends FirePHP{
 	 */
 	public function post()
 	{
+		if (empty($_POST)) return;
+			
 		$table = array();
 		$table[] = array('POST','Value');
 			
